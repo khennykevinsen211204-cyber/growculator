@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Growculator - Growtopia Tools</title>
+<meta name="description" content="Growculator — Kalkulator farming Growtopia terlengkap. Hitung profit provider, surgery, autoclave & more. Gratis selamanya!">
+
+<!-- ══════════════════════════════
+     FAVICON
+     ▼ Ganti href dengan path/URL icon kamu (disarankan .png 32x32 atau 64x64)
+     Contoh: href="assets/favicon.png"
+══════════════════════════════ -->
+<link rel="icon" href="/assets/Growcalc.png" type="image/png">
+<link rel="apple-touch-icon" href="">  <!-- icon di iPhone saat add to homescreen -->
+
+<!-- ══════════════════════════════
+     META OPEN GRAPH
+     Dibaca oleh Discord, WhatsApp, Telegram, Twitter saat link dibagikan
+     ▼ Sesuaikan setiap value dengan milikmu
+══════════════════════════════ -->
+<!-- Judul yang muncul di preview -->
+<meta property="og:title" content="Growculator - Growtopia Tools">
+<meta property="og:description" content="Kalkulator farming Growtopia terlengkap. Hitung profit provider, surgery, autoclave & more. Gratis selamanya!">
+<meta property="og:image" content="https://growcalc.w3spaces.com/assets/Growkulator1200x630.png">
+<meta property="og:url" content="https://growcalc.w3spaces.com/">
+<meta property="og:type" content="website">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://growcalc.w3spaces.com/assets/Growkulator1200x630.png"><!-- Preconnect: browser mulai koneksi ke Google Fonts lebih awal -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- display=swap: teks tampil pakai font sistem dulu, lalu swap ke custom font setelah load -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<script>
+// Didefinisikan di <head> agar tersedia saat onerror img dipanggil
+function iconFallback(img) {
+  img.classList.add('hidden');
+  const fallback = img.dataset.fallback || '❓';
+  if (!img.nextSibling || !img.nextSibling.classList?.contains('emoji-fallback')) {
+    const span = document.createElement('span');
+    span.className = 'emoji-fallback';
+    span.textContent = fallback;
+    img.parentNode.insertBefore(span, img.nextSibling);
+  }
+}
+</script>
+<style>
+:root {
+  --sky:      #1a3a5c;
+  --sky2:     #0f2540;
+  --ground:   #2d5a1b;
+  --dirt:     #5c3a1a;
+  --grass:    #4a9e2f;
+  --grass2:   #3d8226;
+  --gold:     #ffd700;
+  --gold2:    #ffaa00;
+  --wl:       #7ecef4;
+  --gem:      #a855f7;
+  --red:      #ef4444;
+  --text:     #e8f4e8;
+  --dim:      #7aaa8a;
+  --block:    rgba(255,255,255,0.05);
+  --blockb:   rgba(255,255,255,0.08);
+  /* FIX: tambah variable warna bg area tools untuk carousel fade */
+  --tools-bg: #162a18;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: linear-gradient(180deg, var(--sky2) 0%, var(--sky) 40%, #1e4a2e 85%, #1a3d1a 100%);
+  color: var(--text);
+  /* FIX: tambah fallback font sistem agar teks muncul sebelum Nunito selesai load */
+  font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ══════════════════════════════
+   FLOATING PIXEL STARS BG
+══════════════════════════════ */
+.stars {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none; overflow: hidden;
+}
+.star {
+  position: absolute; background: #fff;
+  animation: twinkle var(--dur, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  will-change: opacity, transform;
+  contain: strict; /* isolasi layout agar tidak trigger reflow global */
+}
+@keyframes twinkle {
+  0%,100% { opacity: 0.15; transform: scale(1); }
+  50%      { opacity: 0.9;  transform: scale(1.4); }
+}
+
+/* ══════════════════════════════
+   FLOATING PIXEL BLOCKS BG
+══════════════════════════════ */
+.bg-blocks {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none; overflow: hidden;
+}
+.bg-block {
+  position: absolute; width: 32px; height: 32px;
+  border: 2px solid rgba(255,255,255,0.06); border-radius: 4px;
+  animation: floatBlock var(--dur, 8s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  opacity: 0.15; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  will-change: transform;
+  contain: layout style; /* cegah block ini mempengaruhi layout elemen lain */
+}
+@keyframes floatBlock {
+  0%,100% { transform: translateY(0px) rotate(0deg); }
+  33%      { transform: translateY(-14px) rotate(5deg); }
+  66%      { transform: translateY(-6px) rotate(-3deg); }
+}
+
+/* ══════════════════════════════
+   NAVBAR
+══════════════════════════════ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  height: 58px; display: flex; align-items: center;
+  justify-content: space-between; padding: 0 24px;
+  background: rgba(10, 25, 40, 0.88); backdrop-filter: blur(16px);
+  border-bottom: 3px solid var(--grass);
+  box-shadow: 0 3px 0 var(--grass2), 0 6px 20px rgba(0,0,0,0.4);
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--grass), var(--ground));
+  border-radius: 8px; border: 2px solid var(--grass2);
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,0.3), 0 4px 12px rgba(74,158,47,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; overflow: hidden;
+}
+.brand-text { display: flex; flex-direction: column; gap: 0; }
+.brand-name { font-family: 'Press Start 2P', 'Courier New', monospace; font-size: 10px; letter-spacing: 1px; line-height: 1.2; }
+.brand-name .green { color: var(--grass); }
+.brand-name .white { color: #fff; }
+.brand-sub { font-size: 10px; font-weight: 700; color: var(--dim); letter-spacing: 0.5px; margin-top: 1px; }
+.nav-right { display: flex; align-items: center; gap: 8px; }
+
+.px-btn {
+  font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 800;
+  letter-spacing: 0.5px; padding: 6px 14px; border-radius: 6px;
+  cursor: pointer; border: none; transition: all 0.1s;
+  text-decoration: none; display: inline-block;
+}
+.px-btn:active { transform: translateY(2px); }
+.px-btn.outline {
+  background: transparent; border: 2px solid rgba(255,255,255,0.15); color: var(--dim);
+}
+.px-btn.outline:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+.px-btn.solid {
+  background: linear-gradient(180deg, var(--gold) 0%, var(--gold2) 100%);
+  color: #000; box-shadow: 0 3px 0 #b07800, 0 4px 12px rgba(255,215,0,0.25);
+}
+.px-btn.solid:hover {
+  background: linear-gradient(180deg, #ffe033 0%, #ffbb00 100%);
+  box-shadow: 0 4px 0 #b07800, 0 6px 16px rgba(255,215,0,0.35);
+  transform: translateY(-1px);
+}
+
+/* ══════════════════════════════
+   BILLBOARD 3D BLOCK
+══════════════════════════════ */
+.billboard-zone {
+  position: relative; z-index: 10;
+  max-width: 760px; margin: 0 auto;
+  /* FIX: tambah margin-top = tinggi navbar (58px) agar tidak tertutup */
+  margin-top: 58px;
+  padding: 32px 24px 0;
+}
+
+/* TIANG kiri & kanan */
+.bb-posts {
+  display: flex; justify-content: space-between;
+  padding: 0 56px;
+}
+.bb-post {
+  width: 22px; height: 28px;
+  background: linear-gradient(180deg, #5a9e3a 0%, #2d6b1a 40%, #1a3d10 100%);
+  border-left:  2px solid rgba(255,255,255,0.18);
+  border-right: 2px solid rgba(0,0,0,0.5);
+  box-shadow: 2px 0 6px rgba(0,0,0,0.5);
+  position: relative;
+}
+/* cap atas tiang */
+.bb-post::before {
+  content: '';
+  position: absolute; top: -8px; left: -5px; right: -5px; height: 10px;
+  background: linear-gradient(180deg, #7ed44a 0%, #4a9e2f 100%);
+  border-radius: 4px 4px 0 0;
+  border: 1px solid rgba(255,255,255,0.25);
+  box-shadow: 0 -2px 6px rgba(74,158,47,0.3);
+}
+
+/* PAPAN UTAMA */
+.bb-board {
+  position: relative; z-index: 2;
+  border-radius: 10px;
+  border: 3px solid rgba(255,255,255,0.13);
+  box-shadow:
+    5px 5px 0 rgba(0,0,0,0.55),
+    10px 10px 0 rgba(0,0,0,0.22),
+    0 24px 60px rgba(0,0,0,0.65),
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 -2px 0 rgba(0,0,0,0.35);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.bb-board:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    5px 8px 0 rgba(0,0,0,0.55),
+    10px 14px 0 rgba(0,0,0,0.22),
+    0 32px 70px rgba(0,0,0,0.7),
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 -2px 0 rgba(0,0,0,0.35);
+}
+
+/* shine overlay permanen */
+.bb-board::after {
+  content: '';
+  position: absolute; inset: 0; z-index: 10;
+  background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, transparent 40%);
+  pointer-events: none; border-radius: inherit;
+}
+
+/* SLIDE CONTAINER */
+.bb-slides {
+  position: relative;
+  width: 100%; height: 200px;
+  overflow: hidden;
+  background: #000;
+}
+
+/* tiap slide = gambar penuh */
+.bb-slide {
+  position: absolute; inset: 0;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.bb-slide.active { opacity: 1; }
+
+/* gambar mengisi seluruh slide */
+.bb-slide-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  user-select: none; -webkit-user-drag: none;
+}
+
+/* fallback jika img kosong — warna solid + emoji besar tengah */
+.bb-slide-fallback {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px;
+}
+.bb-slide-fallback-icon { font-size: 52px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.6)); }
+.bb-slide-fallback-text {
+  font-family: 'Press Start 2P', monospace; font-size: 11px; color: #fff;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.6); text-align: center; line-height: 1.8;
+}
+
+/* overlay teks di atas gambar (opsional, muncul di bawah gambar) */
+.bb-slide-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(0deg, rgba(0,0,0,0.72) 0%, transparent 100%);
+  padding: 18px 18px 10px;
+  pointer-events: none;
+}
+.bb-slide-label {
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  color: #fff; text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+  letter-spacing: 0.5px; opacity: 0.9;
+}
+
+/* BOTTOM BAR */
+.bb-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 14px;
+  background: rgba(0,0,0,0.55);
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+.bb-dots { display: flex; gap: 5px; align-items: center; }
+.bb-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.22); border: none; padding: 0; cursor: pointer;
+  transition: all 0.2s;
+}
+.bb-dot.active { width: 18px; border-radius: 3px; background: var(--grass); }
+.bb-counter {
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: rgba(255,255,255,0.35); letter-spacing: 1px;
+}
+
+/* ALAS BAWAH papan */
+.bb-base {
+  height: 10px;
+  background: linear-gradient(180deg, #1e4010 0%, #122a0a 100%);
+  border: 2px solid rgba(0,0,0,0.5);
+  border-top: none; margin: 0 18px;
+  border-radius: 0 0 5px 5px;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+}
+
+/* ══════════════════════════════
+   GROUND DIVIDER
+══════════════════════════════ */
+.ground-divider {
+  position: relative; z-index: 10; max-width: 760px;
+  margin: 0 auto 28px; padding: 0 24px;
+  height: 28px; display: flex; gap: 4px; align-items: flex-end;
+}
+.grass-block {
+  flex: 1; height: 100%;
+  background: linear-gradient(180deg, var(--grass) 30%, var(--grass2) 100%);
+  border-radius: 4px 4px 0 0; border: 2px solid rgba(255,255,255,0.12);
+  border-bottom: none; box-shadow: inset 0 4px 0 rgba(255,255,255,0.15);
+  position: relative;
+}
+.grass-block::before {
+  content: ''; position: absolute; top: -5px; left: 25%;
+  width: 2px; height: 6px; background: #6bd44a; border-radius: 99px;
+  box-shadow: 6px 2px 0 #6bd44a, -5px 1px 0 #6bd44a;
+}
+
+/* ══════════════════════════════
+   TICKER
+══════════════════════════════ */
+.ticker-zone {
+  position: relative; z-index: 10; max-width: 760px;
+  margin: 0 auto 28px; padding: 0 24px;
+}
+.ticker-wrap {
+  display: flex; align-items: center;
+  background: rgba(0,0,0,0.35); border: 2px solid rgba(74,158,47,0.3);
+  border-radius: 10px; overflow: hidden;
+}
+.ticker-tag {
+  flex-shrink: 0;
+  background: linear-gradient(180deg, var(--grass) 0%, var(--grass2) 100%);
+  color: #fff; font-family: 'Press Start 2P', monospace; font-size: 7px;
+  padding: 8px 12px; letter-spacing: 1px;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+  border-right: 2px solid rgba(255,255,255,0.1);
+}
+.ticker-scroll { overflow: hidden; flex: 1; padding: 8px 0; }
+.ticker-inner {
+  display: inline-block; animation: ticker 20s linear infinite;
+  font-size: 11px; font-weight: 800; color: #b8e8a0; white-space: nowrap;
+}
+.ticker-inner span { padding: 0 32px; }
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ══════════════════════════════
+   TOOLS SECTION
+══════════════════════════════ */
+.tools-section {
+  position: relative; z-index: 10; max-width: 760px;
+  margin: 0 auto; padding: 0 24px 80px;
+}
+.section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.section-icon { font-size: 20px; }
+.section-title {
+  font-family: 'Press Start 2P', monospace; font-size: 11px;
+  color: var(--gold); text-shadow: 2px 2px 0 rgba(0,0,0,0.5); letter-spacing: 1px;
+}
+.section-count {
+  margin-left: auto; font-size: 11px; font-weight: 800; color: var(--dim);
+  background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 99px; padding: 3px 10px;
+}
+
+/* ══════════════════════════════
+   CAROUSEL
+══════════════════════════════ */
+.carousel-outer {
+  position: relative; width: 100%; max-width: 760px;
+  margin: 0 auto; overflow: hidden; padding: 32px 0 36px;
+}
+
+/* FIX: warna fade pakai transparent, bukan warna solid yang salah */
+.carousel-outer::before,
+.carousel-outer::after {
+  content: ''; position: absolute; top: 0; bottom: 0;
+  width: 100px; z-index: 5; pointer-events: none;
+}
+.carousel-outer::before {
+  left: 0;
+  background: linear-gradient(90deg, rgba(20,40,22,0.95) 0%, transparent 100%);
+}
+.carousel-outer::after {
+  right: 0;
+  background: linear-gradient(-90deg, rgba(20,40,22,0.95) 0%, transparent 100%);
+}
+
+.carousel-track {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; transition: none; min-height: 160px; position: relative;
+}
+
+/* ARROW BUTTONS */
+.car-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  z-index: 20; width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(74,158,47,0.18); border: 2px solid rgba(74,158,47,0.4);
+  color: #a0e070; font-size: 24px; line-height: 1; cursor: pointer;
+  transition: all .15s; display: flex; align-items: center; justify-content: center;
+}
+.car-arrow:hover {
+  background: rgba(74,158,47,0.4); border-color: rgba(74,158,47,0.8);
+  color: #fff; box-shadow: 0 0 16px rgba(74,158,47,0.3);
+}
+.car-left  { left: 4px; }
+.car-right { right: 4px; }
+
+/* FLOAT ANIMATIONS */
+@keyframes floatItem0 { 0%,100%{transform:translateY(0px);}    50%{transform:translateY(-10px);} }
+@keyframes floatItem1 { 0%,100%{transform:translateY(-4px);}   50%{transform:translateY(-13px);} }
+@keyframes floatItem2 { 0%,100%{transform:translateY(-2px);}   50%{transform:translateY(-8px);}  }
+@keyframes floatItem3 { 0%,100%{transform:translateY(-6px);}   50%{transform:translateY(-14px);} }
+@keyframes floatItem4 { 0%,100%{transform:translateY(-1px);}   50%{transform:translateY(-11px);} }
+
+.car-item {
+  flex-shrink: 0; display: flex; flex-direction: column;
+  align-items: center; gap: 10px; cursor: pointer; position: absolute;
+  transition: opacity .35s cubic-bezier(.4,0,.2,1), left .35s cubic-bezier(.4,0,.2,1);
+}
+.car-item[data-slot="0"] { animation: floatItem0 3.2s ease-in-out infinite; }
+.car-item[data-slot="1"] { animation: floatItem1 2.9s ease-in-out infinite; }
+.car-item[data-slot="2"] { animation: floatItem2 3.5s ease-in-out infinite; }
+.car-item[data-slot="3"] { animation: floatItem3 3.0s ease-in-out infinite; }
+.car-item[data-slot="4"] { animation: floatItem4 3.3s ease-in-out infinite; }
+
+.car-icon-box {
+  border-radius: 18px; display: flex; align-items: center; justify-content: center;
+  border: 2px solid rgba(255,255,255,0.1);
+  box-shadow: 0 8px 0 rgba(0,0,0,0.4), 0 12px 24px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.12);
+  transition: box-shadow .35s, border-color .35s;
+  position: relative; overflow: hidden;
+}
+.car-icon-box::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(160deg, rgba(255,255,255,0.18) 0%, transparent 55%);
+  pointer-events: none; border-radius: inherit;
+}
+.car-icon-box img {
+  width: 80%; height: 80%; object-fit: contain;
+  image-rendering: pixelated; position: relative; z-index: 1;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+}
+.car-item.is-center .car-icon-box {
+  border-color: rgba(74,158,47,0.7);
+  box-shadow: 0 10px 0 rgba(0,0,0,0.45), 0 16px 32px rgba(0,0,0,0.55),
+              0 0 30px rgba(74,158,47,0.3), inset 0 2px 0 rgba(255,255,255,0.18);
+}
+.car-item.is-center .car-icon-box::before {
+  content: ''; position: absolute; bottom: -18px; left: 10%; right: 10%;
+  height: 12px; background: radial-gradient(ellipse, rgba(0,0,0,0.35) 0%, transparent 70%);
+  border-radius: 50%; pointer-events: none; z-index: 0;
+}
+.car-label {
+  font-family: 'Press Start 2P', monospace; font-weight: 700; color: var(--dim);
+  letter-spacing: 0.5px; transition: color .35s; white-space: nowrap;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
+}
+.car-item.is-center .car-label { color: var(--gold); }
+
+.car-badge {
+  position: absolute; top: -6px; right: -6px;
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  padding: 3px 6px; border-radius: 5px; z-index: 3;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.cbadge-active { background:rgba(74,158,47,0.95); color:#fff; border:1px solid rgba(107,212,74,0.6); }
+.cbadge-soon   { background:rgba(40,40,55,0.95);  color:#888; border:1px solid rgba(100,100,120,0.4); }
+.cbadge-new    { background:rgba(255,184,0,0.95);  color:#000; border:1px solid rgba(255,215,0,0.6); }
+
+/* INFO PANEL */
+.tool-info-panel {
+  display: flex; align-items: center; gap: 14px;
+  background: rgba(8,22,12,0.75); border: 2px solid rgba(74,158,47,0.3);
+  border-radius: 14px; padding: 14px 18px;
+  max-width: 760px; margin: 0 auto 14px;
+  backdrop-filter: blur(8px); box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  animation: fadeUp .3s ease;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+
+/* FIX: tip-icon ukuran tetap agar tidak layout shift saat gambar load */
+.tip-icon {
+  min-width: 44px; min-height: 44px; width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(74,158,47,0.3));
+  flex-shrink: 0;
+}
+.tip-icon img {
+  width: 100%; height: 100%; object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.tip-body { flex: 1; min-width: 0; }
+.tip-name {
+  font-family: 'Press Start 2P', monospace; font-size: 10px; color: #fff;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.5); margin-bottom: 5px;
+}
+.tip-desc { font-size: 11px; font-weight: 700; color: var(--dim); line-height: 1.4; }
+.tip-right { display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0; }
+
+.tip-badge { font-family:'Press Start 2P',monospace; font-size:7px; padding:3px 8px; border-radius:4px; }
+.tip-badge.active { background:rgba(74,158,47,0.2); border:1px solid rgba(74,158,47,0.4); color:var(--grass); }
+.tip-badge.soon   { background:rgba(60,60,80,0.5);  border:1px solid rgba(100,100,120,0.3); color:#888; }
+.tip-badge.new    { background:rgba(255,184,0,0.2); border:1px solid rgba(255,215,0,0.4); color:var(--gold); }
+
+.tip-btn {
+  font-size:11px; font-weight:800; padding:6px 14px; border-radius:8px; cursor:pointer;
+  background:linear-gradient(180deg,rgba(74,158,47,0.3),rgba(45,90,27,0.3));
+  border:2px solid rgba(74,158,47,0.4); color:#a0e070; text-decoration:none;
+  transition:all .15s; white-space:nowrap;
+}
+.tip-btn:hover { background:linear-gradient(180deg,rgba(74,158,47,0.55),rgba(45,90,27,0.55)); color:#fff; }
+.tip-btn.disabled { opacity:.3; pointer-events:none; cursor:not-allowed; }
+
+/* DOT INDICATORS */
+.car-dots { display:flex; justify-content:center; gap:5px; margin-top:4px; }
+.car-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:rgba(255,255,255,0.15); border:none; padding:0; cursor:pointer; transition:all .2s;
+}
+.car-dot.active { background:var(--grass); width:18px; border-radius:3px; }
+
+/* ══════════════════════════════
+   ICON IMAGE SYSTEM
+══════════════════════════════ */
+.icon-img { width:100%; height:100%; object-fit:contain; image-rendering:pixelated; display:block; }
+.icon-img.hidden { display:none; }
+
+/* ══════════════════════════════
+   DIRT FLOOR
+══════════════════════════════ */
+.dirt-floor {
+  position:relative; z-index:10; max-width:760px;
+  margin:0 auto; padding:0 24px; height:16px; display:flex; gap:4px;
+}
+.dirt-block {
+  flex:1; height:100%;
+  background:linear-gradient(180deg,var(--dirt) 0%,#3a2010 100%);
+  border-radius:0 0 4px 4px; border:2px solid rgba(255,255,255,0.06); border-top:none;
+}
+
+/* ══════════════════════════════
+   FOOTER
+══════════════════════════════ */
+footer {
+  position:relative; z-index:10; max-width:760px;
+  margin:12px auto 0; padding:20px 24px 40px;
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+}
+.footer-logo { font-family:'Press Start 2P',monospace; font-size:9px; color:var(--dim); letter-spacing:1px; }
+.footer-logo span { color:var(--grass); }
+.footer-sub { font-size:11px; font-weight:700; color:rgba(100,150,100,0.5); letter-spacing:0.5px; }
+
+/* ══════════════════════════════
+   ABOUT MODAL
+══════════════════════════════ */
+.modal-overlay {
+  position:fixed; inset:0; z-index:900;
+  background:rgba(0,0,0,0.7); backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  display:flex; align-items:center; justify-content:center; padding:24px;
+  opacity:0; pointer-events:none; transition:opacity 0.25s ease;
+}
+.modal-overlay.open { opacity:1; pointer-events:all; }
+.modal-box {
+  position:relative; width:100%; max-width:480px; min-height:260px;
+  background:linear-gradient(160deg, #0e2218 0%, #0a1a10 100%);
+  border:2px solid rgba(74,158,47,0.45); border-radius:16px;
+  box-shadow:0 0 0 1px rgba(74,158,47,0.1), 0 24px 60px rgba(0,0,0,0.7), 0 0 40px rgba(74,158,47,0.08);
+  padding:28px 28px 32px;
+  transform:translateY(20px) scale(0.97);
+  transition:transform 0.28s cubic-bezier(.4,0,.2,1);
+}
+.modal-overlay.open .modal-box { transform:translateY(0) scale(1); }
+.modal-topbar {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:20px; padding-bottom:14px;
+  border-bottom:2px solid rgba(74,158,47,0.18);
+}
+.modal-title {
+  font-family:'Press Start 2P',monospace; font-size:10px; color:var(--gold);
+  letter-spacing:1px; text-shadow:2px 2px 0 rgba(0,0,0,0.5);
+  display:flex; align-items:center; gap:8px;
+}
+.modal-close {
+  width:28px; height:28px; border-radius:6px;
+  background:rgba(255,255,255,0.05); border:2px solid rgba(255,255,255,0.1);
+  color:var(--dim); font-size:14px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.15s; line-height:1;
+}
+.modal-close:hover { background:rgba(239,68,68,0.15); border-color:rgba(239,68,68,0.4); color:#ef4444; }
+.modal-content {
+  max-height: 60vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(74,158,47,0.4) transparent;
+}
+.modal-content::-webkit-scrollbar { width: 4px; }
+.modal-content::-webkit-scrollbar-track { background: transparent; }
+.modal-content::-webkit-scrollbar-thumb { background: rgba(74,158,47,0.4); border-radius: 99px; }
+
+/* ── ABOUT: header identitas ── */
+.ab-header {
+  display: flex; align-items: center; gap: 14px;
+  background: rgba(74,158,47,0.07);
+  border: 1px solid rgba(74,158,47,0.15);
+  border-radius: 10px; padding: 12px 14px; margin-bottom: 16px;
+}
+.ab-logo {
+  width: 44px; height: 44px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--grass), var(--ground));
+  border-radius: 10px; border: 2px solid var(--grass2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,0.3);
+}
+.ab-meta { flex: 1; min-width: 0; }
+.ab-appname {
+  font-family: 'Press Start 2P', monospace; font-size: 9px;
+  color: #fff; letter-spacing: 1px; margin-bottom: 4px;
+}
+.ab-appname span { color: var(--grass); }
+.ab-version {
+  font-size: 10px; font-weight: 800; color: var(--dim); letter-spacing: 0.5px;
+}
+
+/* ── ABOUT: section divider ── */
+.ab-section {
+  margin-bottom: 14px;
+}
+.ab-section-title {
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: var(--gold); letter-spacing: 1px;
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 8px; padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.ab-text {
+  font-size: 11px; font-weight: 700; color: var(--dim);
+  line-height: 1.65;
+}
+
+/* ── ABOUT: tools list ── */
+.ab-tools {
+  display: flex; flex-direction: column; gap: 5px;
+}
+.ab-tool-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 8px; border-radius: 7px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.ab-tool-icon { font-size: 14px; flex-shrink: 0; width: 20px; text-align: center; }
+.ab-tool-name { flex: 1; font-size: 11px; font-weight: 800; color: #cde; }
+.ab-tool-badge {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  padding: 2px 6px; border-radius: 4px;
+}
+.ab-badge-active { background:rgba(74,158,47,0.2); border:1px solid rgba(74,158,47,0.4); color:var(--grass); }
+.ab-badge-soon   { background:rgba(60,60,80,0.5);  border:1px solid rgba(100,100,120,0.3); color:#666; }
+.ab-badge-new    { background:rgba(255,184,0,0.2); border:1px solid rgba(255,215,0,0.4);   color:var(--gold); }
+
+/* ── ABOUT: disclaimer box ── */
+.ab-disclaimer {
+  background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 8px; padding: 10px 12px;
+  font-size: 10px; font-weight: 700;
+  color: rgba(255,180,180,0.7); line-height: 1.6;
+}
+
+/* ── ABOUT: contact row ── */
+.ab-contact {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(114,137,218,0.08); border: 1px solid rgba(114,137,218,0.2);
+  border-radius: 8px; padding: 10px 12px; text-decoration: none;
+  transition: all 0.15s; cursor: pointer;
+}
+.ab-contact:hover { background: rgba(114,137,218,0.16); border-color: rgba(114,137,218,0.4); }
+.ab-contact-icon { font-size: 18px; flex-shrink: 0; }
+.ab-contact-body { flex: 1; min-width: 0; }
+.ab-contact-label { font-size: 9px; font-weight: 800; color: #aab; letter-spacing: 0.5px; margin-bottom: 1px; }
+.ab-contact-val { font-family: 'Press Start 2P', monospace; font-size: 7px; color: #7289da; letter-spacing: 0.5px; }
+.ab-contact-arrow { font-size: 14px; color: #7289da; opacity: 0.7; }
+
+/* ══════════════════════════════
+   RESPONSIVE
+══════════════════════════════ */
+@media (max-width: 520px) {
+  nav { padding: 0 14px; }
+  .bb-slides { height: 150px; }
+  .bb-slide-fallback-text { font-size: 9px; }
+}
+</style>
+</head>
+<body>
+
+<!-- FLOATING STARS -->
+<div class="stars" id="stars"></div>
+
+<!-- FLOATING PIXEL BLOCKS -->
+<div class="bg-blocks" id="bgBlocks"></div>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="brand">
+    <div class="brand-icon" role="img" aria-label="Growculator logo">
+      <!-- ▼ BRAND LOGO — ganti src="" dengan path/URL gambar logo kamu -->
+      <img src="" alt="Logo" class="icon-img" data-fallback="🌱" onerror="iconFallback(this)">
+    </div>
+    <div class="brand-text">
+      <div class="brand-name"><span class="green">GROW</span><span class="white">CULATOR</span></div>
+      <div class="brand-sub">Growtopia Calculator Tools</div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <button class="px-btn outline" onclick="openAbout()">About</button>
+    <!-- ▼ Ganti YOURINVITE dengan kode Discord kamu -->
+    <a class="px-btn solid" href="https://discord.gg/YOURINVITE" target="_blank" rel="noopener">DISCORD ▶</a>
+  </div>
+</nav>
+
+<!-- BILLBOARD 3D BLOCK -->
+<div class="billboard-zone">
+
+  <!-- TIANG -->
+  <div class="bb-posts">
+    <div class="bb-post"></div>
+    <div class="bb-post"></div>
+  </div>
+
+  <!-- PAPAN UTAMA -->
+  <div class="bb-board" id="bbBoard">
+
+    <!-- SLIDE CONTAINER -->
+    <div class="bb-slides" id="bbSlides">
+      <!-- Slide dirender oleh JS -->
+    </div>
+
+    <!-- BOTTOM BAR -->
+    <div class="bb-bar">
+      <div class="bb-dots" id="bbDots"></div>
+      <div class="bb-counter" id="bbCounter">1 / 1</div>
+    </div>
+
+  </div>
+
+  <!-- ALAS BAWAH PAPAN -->
+  <div class="bb-base"></div>
+
+</div>
+
+<!-- GROUND DIVIDER -->
+<div class="ground-divider" aria-hidden="true">
+  <div class="grass-block"></div><div class="grass-block"></div>
+  <div class="grass-block"></div><div class="grass-block"></div>
+  <div class="grass-block"></div><div class="grass-block"></div>
+  <div class="grass-block"></div><div class="grass-block"></div>
+  <div class="grass-block"></div><div class="grass-block"></div>
+  <div class="grass-block"></div><div class="grass-block"></div>
+  <div class="grass-block"></div><div class="grass-block"></div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker-zone" aria-label="News ticker">
+  <div class="ticker-wrap">
+    <div class="ticker-tag" aria-hidden="true">NEWS</div>
+    <div class="ticker-scroll">
+      <div class="ticker-inner">
+        <span>🌱 Kalkulator Growtopia Terpercaya</span>
+        <span>🔒 Hitung Profit Farming Otomatis</span>
+        <span>⭐ Tools Terlengkap untuk Growtopia</span>
+        <span>🐔 Provider, Surgery, Autoclave & More</span>
+        <span>🌱 Kalkulator Growtopia Terpercaya</span>
+        <span>🔒 Hitung Profit Farming Otomatis</span>
+        <span>⭐ Tools Terlengkap untuk Growtopia</span>
+        <span>🐔 Provider, Surgery, Autoclave & More</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOOLS CAROUSEL -->
+<section class="tools-section">
+  <div class="section-header">
+    <div class="section-icon" aria-hidden="true">📦</div>
+    <div class="section-title">Available Tools</div>
+    <div class="section-count" id="toolCount">07 Modules</div>
+  </div>
+
+  <div class="carousel-outer">
+    <button class="car-arrow car-left"  onclick="carMove(-1)" aria-label="Previous tool">&#8249;</button>
+    <button class="car-arrow car-right" onclick="carMove(1)"  aria-label="Next tool">&#8250;</button>
+    <div class="carousel-track" id="carTrack"></div>
+  </div>
+
+  <!-- ACTIVE TOOL INFO PANEL -->
+  <div class="tool-info-panel" id="toolInfoPanel" aria-live="polite">
+    <div class="tip-icon" id="tipIcon"></div>
+    <div class="tip-body">
+      <div class="tip-name" id="tipName">Provider</div>
+      <div class="tip-desc" id="tipDesc">Calculate providers like chicken, cow, science station & tackle box.</div>
+    </div>
+    <div class="tip-right">
+      <span class="tip-badge" id="tipBadge">ACTIVE</span>
+      <a class="tip-btn" id="tipBtn" href="growculator.html">Launch ▶</a>
+    </div>
+  </div>
+
+  <!-- DOT INDICATORS -->
+  <div class="car-dots" id="carDots" role="tablist" aria-label="Tool selector"></div>
+</section>
+
+<!-- DIRT FLOOR -->
+<div class="dirt-floor" aria-hidden="true">
+  <div class="dirt-block"></div><div class="dirt-block"></div>
+  <div class="dirt-block"></div><div class="dirt-block"></div>
+  <div class="dirt-block"></div><div class="dirt-block"></div>
+  <div class="dirt-block"></div><div class="dirt-block"></div>
+  <div class="dirt-block"></div><div class="dirt-block"></div>
+  <div class="dirt-block"></div><div class="dirt-block"></div>
+  <div class="dirt-block"></div>
+</div>
+
+<!-- ABOUT MODAL -->
+<div class="modal-overlay" id="aboutOverlay" role="dialog" aria-modal="true" aria-label="About Growculator">
+  <div class="modal-box" id="aboutBox">
+    <div class="modal-topbar">
+      <div class="modal-title">📋 About</div>
+      <button class="modal-close" onclick="closeAbout()" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-content" id="aboutContent">
+
+      <!-- IDENTITAS -->
+      <div class="ab-header">
+        <div class="ab-logo">🌱</div>
+        <div class="ab-meta">
+          <div class="ab-appname"><span>GROW</span>CULATOR</div>
+          <div class="ab-version">v1.0 · Juni 2026 · Gratis Selamanya</div>
+        </div>
+      </div>
+
+      <!-- TENTANG -->
+      <div class="ab-section">
+        <div class="ab-section-title">📖 TENTANG</div>
+        <p class="ab-text">
+          Growculator dibuat untuk membantu petani Growtopia menghitung
+          profit farming dengan cepat dan akurat — tanpa perlu hitung
+          manual lagi. Semua tools tersedia gratis untuk komunitas GT.
+        </p>
+      </div>
+
+      <!-- TOOLS -->
+      <div class="ab-section">
+        <div class="ab-section-title">🧰 AVAILABLE TOOLS</div>
+        <div class="ab-tools">
+          <div class="ab-tool-row">
+            <span class="ab-tool-icon">🐔</span>
+            <span class="ab-tool-name">Provider</span>
+            <span class="ab-tool-badge ab-badge-active">ACTIVE</span>
+          </div>
+          <div class="ab-tool-row">
+            <span class="ab-tool-icon">🔬</span>
+            <span class="ab-tool-name">Surgery</span>
+            <span class="ab-tool-badge ab-badge-soon">SOON</span>
+          </div>
+          <div class="ab-tool-row">
+            <span class="ab-tool-icon">⚗️</span>
+            <span class="ab-tool-name">Autoclave</span>
+            <span class="ab-tool-badge ab-badge-soon">SOON</span>
+          </div>
+          <div class="ab-tool-row">
+            <span class="ab-tool-icon">🕵️</span>
+            <span class="ab-tool-name">Crime</span>
+            <span class="ab-tool-badge ab-badge-soon">SOON</span>
+          </div>
+          <div class="ab-tool-row">
+            <span class="ab-tool-icon">🚀</span>
+            <span class="ab-tool-name">Startopia</span>
+            <span class="ab-tool-badge ab-badge-soon">SOON</span>
+          </div>
+          <div class="ab-tool-row">
+            <span class="ab-tool-icon">🤖</span>
+            <span class="ab-tool-name">Nanoforge</span>
+            <span class="ab-tool-badge ab-badge-soon">SOON</span>
+          </div>
+          <div class="ab-tool-row">
+            <span class="ab-tool-icon">👑</span>
+            <span class="ab-tool-name">Growpass</span>
+            <span class="ab-tool-badge ab-badge-new">NEW</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KONTAK -->
+      <div class="ab-section">
+        <div class="ab-section-title">📬 KONTAK</div>
+        <!-- ▼ Ganti href dengan link Discord kamu -->
+        <a class="ab-contact" href="https://discord.gg/YOURINVITE" target="_blank" rel="noopener">
+          <span class="ab-contact-icon">💬</span>
+          <div class="ab-contact-body">
+            <div class="ab-contact-label">Discord Server</div>
+            <!-- ▼ Ganti teks di bawah dengan nama server Discord kamu -->
+            <div class="ab-contact-val">discord.gg/YOURINVITE</div>
+          </div>
+          <span class="ab-contact-arrow">›</span>
+        </a>
+      </div>
+
+      <!-- DISCLAIMER -->
+      <div class="ab-section">
+        <div class="ab-section-title">⚠️ DISCLAIMER</div>
+        <div class="ab-disclaimer">
+          Growculator is a fan-made tool and is not affiliated with,
+          endorsed by, or connected to Ubisoft or Growtopia in any way.
+          All game assets, names, and trademarks belong to their
+          respective owners.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo"><span>GROW</span>CULATOR v1.0</div>
+  <div class="footer-sub">Built for the Growtopia Community · Always Free 🌱</div>
+</footer>
+
+<script>
+// ══════════════════════════════
+//  ABOUT MODAL
+//  FIX: definisikan lebih awal agar tidak error saat dipanggil keydown
+// ══════════════════════════════
+const aboutOverlay = document.getElementById('aboutOverlay');
+
+function openAbout() {
+  aboutOverlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeAbout() {
+  aboutOverlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+aboutOverlay.addEventListener('click', e => {
+  if (e.target === aboutOverlay) closeAbout();
+});
+
+// Trigger fallback untuk img dengan src kosong saat load
+window.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('img.icon-img').forEach(img => {
+    if (!img.getAttribute('src')) iconFallback(img);
+  });
+});
+
+// ══════════════════════════════
+//  BILLBOARD DATA
+//  ▼ Setiap slide cukup isi:
+//    img   : path/URL gambar (wajib, ukuran bebas, disarankan 16:9 atau lebar)
+//    label : teks kecil di pojok kiri bawah gambar (opsional, kosongkan '')
+//    href  : link saat papan diklik (kosongkan '#' jika tidak ada)
+//    bg    : warna background jika gambar belum diisi (CSS color/gradient)
+//    fallbackIcon  : emoji besar jika gambar belum ada
+//    fallbackTitle : teks jika gambar belum ada
+// ══════════════════════════════
+const bbSlides = [
+  {
+    img:           '',
+    label:         '⭐ Growculator v1.0',
+    href:          '#',
+    bg:            'linear-gradient(135deg,#1a3d10,#0d2408)',
+    fallbackIcon:  '🌱',
+    fallbackTitle: 'GROWCULATOR\nv1.0',
+  },
+  {
+    img:           '',
+    label:         '🐔 Provider Calculator',
+    href:          'growculator.html',
+    bg:            'linear-gradient(135deg,#1a3d10,#0d2408)',
+    fallbackIcon:  '🐔',
+    fallbackTitle: 'PROVIDER\nCALCULATOR',
+  },
+  {
+    img:           '',
+    label:         '👑 Growpass — Coming Soon',
+    href:          '#',
+    bg:            'linear-gradient(135deg,#2a1a3d,#160a2a)',
+    fallbackIcon:  '👑',
+    fallbackTitle: 'GROWPASS\nCOMING SOON',
+  },
+];
+
+let bbCurrent = 0;
+let bbTimer   = null;
+const BB_INTERVAL = 4000;
+
+function renderBillboard() {
+  const slidesEl  = document.getElementById('bbSlides');
+  const dotsEl    = document.getElementById('bbDots');
+  const counterEl = document.getElementById('bbCounter');
+
+  // Build slides
+  slidesEl.innerHTML = bbSlides.map((s, i) => {
+    const isActive = i === 0 ? ' active' : '';
+    if (s.img) {
+      // Full image slide
+      return `
+      <div class="bb-slide${isActive}" data-idx="${i}" data-href="${s.href}">
+        <img class="bb-slide-img" src="${s.img}" alt="Promo ${i+1}" draggable="false">
+        ${s.label ? `<div class="bb-slide-overlay"><div class="bb-slide-label">${s.label}</div></div>` : ''}
+      </div>`;
+    } else {
+      // Fallback — warna + emoji + teks
+      const lines = s.fallbackTitle.split('\n');
+      return `
+      <div class="bb-slide${isActive}" data-idx="${i}" data-href="${s.href}"
+           style="background:${s.bg};">
+        <div class="bb-slide-fallback">
+          <div class="bb-slide-fallback-icon">${s.fallbackIcon}</div>
+          <div class="bb-slide-fallback-text">${lines.join('<br>')}</div>
+        </div>
+        ${s.label ? `<div class="bb-slide-overlay"><div class="bb-slide-label">${s.label}</div></div>` : ''}
+      </div>`;
+    }
+  }).join('');
+
+  // Build dots
+  dotsEl.innerHTML = '';
+  bbSlides.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'bb-dot' + (i === 0 ? ' active' : '');
+    d.setAttribute('aria-label', `Slide ${i + 1}`);
+    d.onclick = (e) => { e.stopPropagation(); bbGoTo(i); };
+    dotsEl.appendChild(d);
+  });
+
+  counterEl.textContent = `1 / ${bbSlides.length}`;
+}
+
+function bbGoTo(idx) {
+  const slides = document.querySelectorAll('.bb-slide');
+  const dots   = document.querySelectorAll('.bb-dot');
+  slides[bbCurrent].classList.remove('active');
+  dots[bbCurrent].classList.remove('active');
+  bbCurrent = ((idx % bbSlides.length) + bbSlides.length) % bbSlides.length;
+  slides[bbCurrent].classList.add('active');
+  dots[bbCurrent].classList.add('active');
+  document.getElementById('bbCounter').textContent = `${bbCurrent + 1} / ${bbSlides.length}`;
+  clearInterval(bbTimer);
+  bbTimer = setInterval(() => bbGoTo(bbCurrent + 1), BB_INTERVAL);
+}
+
+// Klik papan → ikuti href slide atau pindah slide
+document.getElementById('bbBoard').addEventListener('click', e => {
+  if (e.target.closest('.bb-dot')) return;
+  const href = bbSlides[bbCurrent].href;
+  if (href && href !== '#') {
+    window.location.href = href;
+  } else {
+    bbGoTo(bbCurrent + 1);
+  }
+});
+
+renderBillboard();
+bbTimer = setInterval(() => bbGoTo(bbCurrent + 1), BB_INTERVAL);
+
+// ══════════════════════════════
+//  BG STARS — dioptimasi untuk HP low-end
+// ══════════════════════════════
+const starsEl = document.getElementById('stars');
+
+// Deteksi low-end: layar kecil ATAU hardware concurrency rendah
+const isLowEnd = (navigator.hardwareConcurrency || 4) <= 2
+               || window.innerWidth < 480;
+
+// Kurangi jumlah elemen sesuai kemampuan device
+const STAR_COUNT  = isLowEnd ? 20 : 40;   // was 60
+const BLOCK_COUNT = isLowEnd ? 4  : 9;    // was 9
+
+// Defer pembuatan ke setelah render pertama selesai (tidak blocking)
+requestAnimationFrame(() => {
+  // Buat bintang dalam satu DocumentFragment — 1x DOM insert, bukan 60x
+  const starFrag = document.createDocumentFragment();
+  for (let i = 0; i < STAR_COUNT; i++) {
+    const s    = document.createElement('div');
+    s.className = 'star';
+    const size  = Math.random() < 0.3 ? 2 : 1;
+    s.style.cssText = [
+      `width:${size}px`,
+      `height:${size}px`,
+      `top:${Math.random()*60}%`,
+      `left:${Math.random()*100}%`,
+      `--dur:${2+Math.random()*3}s`,
+      `--delay:${Math.random()*4}s`,
+      `border-radius:50%`,
+      `will-change:opacity,transform`, // hint GPU
+    ].join(';');
+    starFrag.appendChild(s);
+  }
+  starsEl.appendChild(starFrag);
+
+  // ══════════════════════════════
+  //  BG BLOCKS — jumlah dikurangi di low-end
+  // ══════════════════════════════
+  const blocksEl  = document.getElementById('bgBlocks');
+  const allEmojis = ['🌱','🍀','🌿','⭐','🔒','💎','🪙','🌸','🍄'];
+  const emojis    = allEmojis.slice(0, BLOCK_COUNT);
+  const blockFrag = document.createDocumentFragment();
+
+  emojis.forEach((e, i) => {
+    const b = document.createElement('div');
+    b.className = 'bg-block';
+    b.textContent = e;
+    b.setAttribute('aria-hidden', 'true');
+    b.style.cssText = [
+      `top:${5+Math.random()*70}%`,
+      `left:${i*(100/BLOCK_COUNT)+Math.random()*8}%`,
+      `--dur:${6+Math.random()*5}s`,
+      `--delay:${Math.random()*5}s`,
+      `will-change:transform`,
+    ].join(';');
+    blockFrag.appendChild(b);
+  });
+  blocksEl.appendChild(blockFrag);
+});
+
+// ══════════════════════════════
+//  PAUSE animasi saat tab tidak aktif — hemat baterai & CPU
+// ══════════════════════════════
+document.addEventListener('visibilitychange', () => {
+  const paused = document.hidden ? 'paused' : 'running';
+  starsEl.style.animationPlayState         = paused;
+  document.getElementById('bgBlocks').style.animationPlayState = paused;
+});
+
+// ══════════════════════════════
+//  TOOLS DATA
+//  ▼ Isi field `img` dengan path/URL gambar masing-masing tool
+//    Contoh: img:'assets/provider.png'
+//            img:'https://i.imgur.com/xxx.png'
+//    Kosongkan ('') untuk pakai emoji fallback
+// ══════════════════════════════
+const tools = [
+  { img:'', emoji:'🐔', name:'Provider',  badge:'active', href:'growculator.html', color:'#2d6b1a',
+    desc:'Calculate providers like chicken, cow, science station & tackle box. Estimate drops and profit per cycle.' },
+  { img:'', emoji:'🔬', name:'Surgery',   badge:'soon',   href:'#',               color:'#1a3d6b',
+    desc:'Calculate profit from surgery packs. Estimate tools needed to perform the surgery.' },
+  { img:'', emoji:'⚗️', name:'Autoclave', badge:'soon',   href:'#',               color:'#1a5a5a',
+    desc:'Calculate how many Stitches or Surg tools you can get using the Autoclave efficiently.' },
+  { img:'', emoji:'🕵️', name:'Crime',    badge:'soon',   href:'#',               color:'#6b1a1a',
+    desc:'Calculate the profit earned from selling Crime packs retail in Growtopia.' },
+  { img:'', emoji:'🚀', name:'Startopia', badge:'soon',   href:'#',               color:'#6b3d1a',
+    desc:'Calculate the profit earned from selling Gala packs retail with precision.' },
+  { img:'', emoji:'🤖', name:'Nanoforge', badge:'soon',   href:'#',               color:'#1a5a5a',
+    desc:'Calculate how many tactical drones or teleport charges you get using nano forge tools.' },
+  { img:'', emoji:'👑', name:'Growpass',  badge:'new',    href:'#',               color:'#5a4a10',
+    desc:'Calculate how many points to complete the Growpass, tracking daily points whether premium or free.' },
+];
+
+// Update stat angka tools otomatis
+document.getElementById('toolCount').textContent = tools.length.toString().padStart(2,'0') + ' Modules';
+// toolStatVal sudah dihapus bersama hero stats, skip jika tidak ada
+const toolStatValEl = document.getElementById('toolStatVal');
+if (toolStatValEl) toolStatValEl.textContent = tools.length;
+
+// ══════════════════════════════
+//  CAROUSEL
+// ══════════════════════════════
+let current  = 0;
+const VISIBLE = 5;
+const carTrack = document.getElementById('carTrack');
+const dotsEl   = document.getElementById('carDots');
+
+// Build dots
+tools.forEach((t, i) => {
+  const d = document.createElement('button');
+  d.className = 'car-dot' + (i === 0 ? ' active' : '');
+  d.setAttribute('aria-label', `Go to ${t.name}`);
+  d.setAttribute('role', 'tab');
+  d.onclick = () => goTo(i);
+  dotsEl.appendChild(d);
+});
+
+function renderCarousel() {
+  const n       = tools.length;
+  const half    = Math.floor(VISIBLE / 2);
+  const maxSize = Math.min(130, Math.max(90, Math.floor(520 / n)));
+
+  carTrack.innerHTML = '';
+  carTrack.style.height = (maxSize + 56) + 'px';
+
+  const outerW  = carTrack.parentElement.clientWidth;
+  const centerX = outerW / 2;
+  const slotW   = Math.floor(outerW / VISIBLE);
+
+  for (let slot = 0; slot < VISIBLE; slot++) {
+    const offset  = slot - half;
+    const idx     = ((current + offset) % n + n) % n;
+    const t       = tools[idx];
+    const dist    = Math.abs(offset);
+    const size    = Math.round(maxSize * (1 - dist * 0.2));
+    const opacity = 1 - dist * 0.25;
+    const zIdx    = VISIBLE - dist;
+    const xPos    = centerX + offset * slotW - size / 2;
+
+    const item = document.createElement('div');
+    item.className    = 'car-item' + (offset === 0 ? ' is-center' : '');
+    item.dataset.slot = slot;
+    item.setAttribute('role', 'button');
+    item.setAttribute('aria-label', offset === 0 ? `Open ${t.name}` : `Go to ${t.name}`);
+    item.style.cssText = `left:${xPos}px;opacity:${opacity};z-index:${zIdx};`;
+
+    const iconContent = t.img
+      ? `<img src="${t.img}" alt="${t.name}" draggable="false" loading="lazy">`
+      : `<span style="font-size:${Math.round(size*0.46)}px;position:relative;z-index:1;
+           filter:drop-shadow(0 4px 8px rgba(0,0,0,0.5));">${t.emoji}</span>`;
+
+    item.innerHTML = `
+      <div class="car-icon-box" style="
+        width:${size}px;height:${size}px;
+        background:linear-gradient(145deg,${t.color} 0%,rgba(0,0,0,0.5) 100%);">
+        ${iconContent}
+        <span class="car-badge cbadge-${t.badge}">${t.badge.toUpperCase()}</span>
+      </div>
+      <div class="car-label" style="font-size:${Math.max(6,Math.round(size*0.09))}px;">
+        ${t.name}
+      </div>`;
+
+    item.onclick = () => { offset !== 0 ? goTo(idx) : openTool(idx); };
+    carTrack.appendChild(item);
+  }
+
+  // Update info panel
+  const active    = tools[current];
+  const tipIconEl = document.getElementById('tipIcon');
+  if (active.img) {
+    tipIconEl.innerHTML = `<img src="${active.img}" alt="${active.name}"
+      style="width:100%;height:100%;object-fit:contain;image-rendering:pixelated;
+             filter:drop-shadow(0 3px 6px rgba(0,0,0,0.5));">`;
+  } else {
+    tipIconEl.innerHTML = `<span style="font-size:32px;">${active.emoji}</span>`;
+  }
+
+  document.getElementById('tipName').textContent = active.name;
+  document.getElementById('tipDesc').textContent = active.desc;
+
+  const badgeEl     = document.getElementById('tipBadge');
+  badgeEl.textContent = active.badge.toUpperCase();
+  badgeEl.className   = 'tip-badge ' + active.badge;
+
+  const btnEl     = document.getElementById('tipBtn');
+  btnEl.href      = active.href;
+  btnEl.className = 'tip-btn' + (active.href === '#' ? ' disabled' : '');
+
+  document.querySelectorAll('.car-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === current);
+    d.setAttribute('aria-selected', i === current ? 'true' : 'false');
+  });
+}
+
+function goTo(idx) {
+  current = ((idx % tools.length) + tools.length) % tools.length;
+  renderCarousel();
+}
+function carMove(dir) { goTo(current + dir); }
+function openTool(idx) {
+  if (tools[idx].href !== '#') window.location.href = tools[idx].href;
+}
+
+// Swipe
+let touchStartX = 0;
+carTrack.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive:true });
+carTrack.addEventListener('touchend',   e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 40) carMove(dx < 0 ? 1 : -1);
+});
+
+// Keyboard
+window.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft')  carMove(-1);
+  if (e.key === 'ArrowRight') carMove(1);
+  if (e.key === 'Escape')     closeAbout();
+});
+
+// Debounce resize
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(renderCarousel, 150);
+});
+
+renderCarousel();
+</script>
+</body>
+</html>
