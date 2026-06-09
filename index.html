@@ -12,7 +12,7 @@
      Contoh: href="assets/favicon.png"
 ══════════════════════════════ -->
 <link rel="icon" href="logo.png" type="image/png">
-<link rel="apple-touch-icon" href="">  <!-- icon di iPhone saat add to homescreen -->
+<link rel="apple-touch-icon" href="logo.png">  <!-- icon di iPhone saat add to homescreen -->
 
 <!-- ══════════════════════════════
      META OPEN GRAPH
@@ -733,7 +733,7 @@ footer {
   <div class="brand">
     <div class="brand-icon" role="img" aria-label="Growculator logo">
       <!-- ▼ BRAND LOGO — ganti src="" dengan path/URL gambar logo kamu -->
-      <img src="https://cdn.growtopiawiki.com/sprites/2408.png" alt="Logo" class="icon-img" data-fallback="🌱" onerror="iconFallback(this)">
+      <img src="logo.png" alt="Logo" class="icon-img" data-fallback="🌱" onerror="iconFallback(this)">
     </div>
     <div class="brand-text">
       <div class="brand-name"><span class="green">GROW</span><span class="white">CULATOR</span></div>
@@ -794,14 +794,15 @@ footer {
     <div class="ticker-tag" aria-hidden="true">NEWS</div>
     <div class="ticker-scroll">
       <div class="ticker-inner">
-        <span>🌱 Kalkulator Growtopia Terpercaya</span>
-        <span>🔒 Hitung Profit Farming Otomatis</span>
-        <span>⭐ Tools Terlengkap untuk Growtopia</span>
-        <span>🐔 Provider, Surgery, Autoclave & More</span>
-        <span>🌱 Kalkulator Growtopia Terpercaya</span>
-        <span>🔒 Hitung Profit Farming Otomatis</span>
-        <span>⭐ Tools Terlengkap untuk Growtopia</span>
-        <span>🐔 Provider, Surgery, Autoclave & More</span>
+        <!-- ▼ Ganti src di setiap img dengan path/URL gambar kamu -->
+        <span><img src="https://cdn.growtopiawiki.com/sprites/2408.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Kalkulator Growtopia Terpercaya</span>
+        <span><img src="https://cdn.growtopiawiki.com/sprites/242.png"  alt="" style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Hitung Profit Farming Otomatis</span>
+        <span><img src="https://cdn.growtopiawiki.com/sprites/11538.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Tools Terlengkap untuk Growtopia</span>
+        <span><img src="https://cdn.growtopiawiki.com/sprites/3044.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Provider, Surgery, Autoclave & More</span>
+        <span><img src="https://cdn.growtopiawiki.com/sprites/2408.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Kalkulator Growtopia Terpercaya</span>
+        <span><img src="https://cdn.growtopiawiki.com/sprites/242.png"  alt="" style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Hitung Profit Farming Otomatis</span>
+        <span><img src="https://cdn.growtopiawiki.com/sprites/11538.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Tools Terlengkap untuk Growtopia</span>
+        <span><img src="https://cdn.growtopiawiki.com/sprites/3044.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Provider, Surgery, Autoclave & More</span>
       </div>
     </div>
   </div>
@@ -860,7 +861,13 @@ footer {
 
       <!-- IDENTITAS -->
       <div class="ab-header">
-        <div class="ab-logo">🌱</div>
+        <div class="ab-logo">
+          <!-- ▼ Ganti src="logo.png" dengan path logo kamu, atau hapus tag img untuk pakai emoji -->
+          <img src="logo.png" alt="Growculator"
+            style="width:36px;height:36px;object-fit:contain;image-rendering:pixelated;border-radius:6px;"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+          <span style="display:none;font-size:22px;">🌱</span>
+        </div>
         <div class="ab-meta">
           <div class="ab-appname"><span>GROW</span>CULATOR</div>
           <div class="ab-version">v1.0 · Juni 2026 · Gratis Selamanya</div>
@@ -882,37 +889,66 @@ footer {
         <div class="ab-section-title">🧰 AVAILABLE TOOLS</div>
         <div class="ab-tools">
           <div class="ab-tool-row">
-            <span class="ab-tool-icon">🐔</span>
+            <!-- ▼ Ganti src dengan path/URL gambar masing-masing tool -->
+            <span class="ab-tool-icon">
+              <img src="https://cdn.growtopiawiki.com/sprites/3044.png" alt="Provider"
+                style="width:16px;height:16px;object-fit:contain;image-rendering:pixelated;vertical-align:middle;"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none;">🐔</span>
+            </span>
             <span class="ab-tool-name">Provider</span>
             <span class="ab-tool-badge ab-badge-active">ACTIVE</span>
           </div>
           <div class="ab-tool-row">
-            <span class="ab-tool-icon">🔬</span>
+            <span class="ab-tool-icon">
+              <img src="https://cdn.growtopiawiki.com/sprites/10836.png" alt="Surgery"
+                style="width:16px;height:16px;object-fit:contain;image-rendering:pixelated;vertical-align:middle;"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none;">🔬</span>
+            </span>
             <span class="ab-tool-name">Surgery</span>
             <span class="ab-tool-badge ab-badge-soon">SOON</span>
           </div>
           <div class="ab-tool-row">
-            <span class="ab-tool-icon">⚗️</span>
+            <span class="ab-tool-icon">
+              <img src="https://cdn.growtopiawiki.com/sprites/4322.png" alt="Autoclave"
+                style="width:16px;height:16px;object-fit:contain;image-rendering:pixelated;vertical-align:middle;"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none;">⚗️</span>
+            </span>
             <span class="ab-tool-name">Autoclave</span>
             <span class="ab-tool-badge ab-badge-soon">SOON</span>
           </div>
           <div class="ab-tool-row">
-            <span class="ab-tool-icon">🕵️</span>
+            <span class="ab-tool-icon">
+              <img src="https://cdn.growtopiawiki.com/sprites/10842.png" alt="Crime"
+                style="width:16px;height:16px;object-fit:contain;image-rendering:pixelated;vertical-align:middle;"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none;">🕵️</span>
+            </span>
             <span class="ab-tool-name">Crime</span>
             <span class="ab-tool-badge ab-badge-soon">SOON</span>
           </div>
           <div class="ab-tool-row">
-            <span class="ab-tool-icon">🚀</span>
+            <span class="ab-tool-icon">
+              <img src="https://cdn.growtopiawiki.com/sprites/10834.png" alt="Startopia"
+                style="width:16px;height:16px;object-fit:contain;image-rendering:pixelated;vertical-align:middle;"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none;">🚀</span>
+            </span>
             <span class="ab-tool-name">Startopia</span>
             <span class="ab-tool-badge ab-badge-soon">SOON</span>
           </div>
           <div class="ab-tool-row">
-            <span class="ab-tool-icon">🤖</span>
+            <span class="ab-tool-icon">
+              <img src="https://cdn.growtopiawiki.com/sprites/7008.png" alt="Nanoforge"
+                style="width:16px;height:16px;object-fit:contain;image-rendering:pixelated;vertical-align:middle;"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none;">🤖</span>
+            </span>
             <span class="ab-tool-name">Nanoforge</span>
             <span class="ab-tool-badge ab-badge-soon">SOON</span>
           </div>
           <div class="ab-tool-row">
-            <span class="ab-tool-icon">👑</span>
+            <span class="ab-tool-icon">
+              <img src="https://cdn.growtopiawiki.com/sprites/11538.png" alt="Growpass"
+                style="width:16px;height:16px;object-fit:contain;image-rendering:pixelated;vertical-align:middle;"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none;">👑</span>
+            </span>
             <span class="ab-tool-name">Growpass</span>
             <span class="ab-tool-badge ab-badge-new">NEW</span>
           </div>
@@ -993,7 +1029,7 @@ window.addEventListener('DOMContentLoaded', () => {
 // ══════════════════════════════
 const bbSlides = [
   {
-    img:           '',
+    img:           'banner1.png',
     label:         '⭐ Growculator v1.0',
     href:          '#',
     bg:            'linear-gradient(135deg,#1a3d10,#0d2408)',
