@@ -3,1321 +3,1105 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Growculator - Growtopia Tools</title>
-<meta name="description" content="Growculator — Kalkulator farming Growtopia terlengkap. Hitung profit provider, surgery, autoclave & more. Gratis selamanya!">
-
-<!-- ══════════════════════════════
-     FAVICON
-     ▼ Ganti href dengan path/URL icon kamu (disarankan .png 32x32 atau 64x64)
-     Contoh: href="assets/favicon.png"
-══════════════════════════════ -->
-<link rel="icon" href="/assets/Growcalc.png" type="image/png">
-<link rel="apple-touch-icon" href="">  <!-- icon di iPhone saat add to homescreen -->
-
-<!-- ══════════════════════════════
-     META OPEN GRAPH
-     Dibaca oleh Discord, WhatsApp, Telegram, Twitter saat link dibagikan
-     ▼ Sesuaikan setiap value dengan milikmu
-══════════════════════════════ -->
-<!-- Judul yang muncul di preview -->
-<meta property="og:title" content="Growculator - Growtopia Tools">
-<meta property="og:description" content="Kalkulator farming Growtopia terlengkap. Hitung profit provider, surgery, autoclave & more. Gratis selamanya!">
-<meta property="og:image" content="https://khennykevinsen211204-cyber.github.io/growculator/Teks%20paragraf%20Anda%20(2).png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:url" content="https://khennykevinsen211204-cyber.github.io/growculator/">
-<meta property="og:type" content="website">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://khennykevinsen211204-cyber.github.io/growculator/Teks%20paragraf%20Anda%20(2).png"><!-- Preconnect: browser mulai koneksi ke Google Fonts lebih awal -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- display=swap: teks tampil pakai font sistem dulu, lalu swap ke custom font setelah load -->
+<title>Growculator - Provider Calculator</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-<script>
-// Didefinisikan di <head> agar tersedia saat onerror img dipanggil
-function iconFallback(img) {
-  img.classList.add('hidden');
-  const fallback = img.dataset.fallback || '❓';
-  if (!img.nextSibling || !img.nextSibling.classList?.contains('emoji-fallback')) {
-    const span = document.createElement('span');
-    span.className = 'emoji-fallback';
-    span.textContent = fallback;
-    img.parentNode.insertBefore(span, img.nextSibling);
-  }
-}
-</script>
 <style>
 :root {
-  --sky:      #1a3a5c;
-  --sky2:     #0f2540;
-  --ground:   #2d5a1b;
-  --dirt:     #5c3a1a;
-  --grass:    #4a9e2f;
-  --grass2:   #3d8226;
-  --gold:     #ffd700;
-  --gold2:    #ffaa00;
-  --wl:       #7ecef4;
-  --gem:      #a855f7;
-  --red:      #ef4444;
-  --text:     #e8f4e8;
-  --dim:      #7aaa8a;
-  --block:    rgba(255,255,255,0.05);
-  --blockb:   rgba(255,255,255,0.08);
-  /* FIX: tambah variable warna bg area tools untuk carousel fade */
-  --tools-bg: #162a18;
+  --sky:    #0f2540;
+  --sky2:   #1a3a5c;
+  --grass:  #4a9e2f;
+  --grass2: #3d8226;
+  --gold:   #ffd700;
+  --gold2:  #ffaa00;
+  --text:   #e8f4e8;
+  --dim:    #7aaa8a;
+  --green:  #6bd44a;
+  --card:   rgba(8,22,12,0.78);
+  --border: rgba(74,158,47,0.25);
 }
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-
-body {
-  background: linear-gradient(180deg, var(--sky2) 0%, var(--sky) 40%, #1e4a2e 85%, #1a3d1a 100%);
-  color: var(--text);
-  /* FIX: tambah fallback font sistem agar teks muncul sebelum Nunito selesai load */
-  font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html, body {
+  background: linear-gradient(180deg, var(--sky) 0%, var(--sky2) 55%, #1e3d28 100%);
+  color: var(--text); font-family: 'Nunito', sans-serif;
+  min-height: 100vh; overflow-x: hidden;
 }
-
-/* ══════════════════════════════
-   FLOATING PIXEL STARS BG
-══════════════════════════════ */
-.stars {
-  position: fixed; inset: 0; z-index: 0;
-  pointer-events: none; overflow: hidden;
-}
-.star {
-  position: absolute; background: #fff;
-  animation: twinkle var(--dur, 3s) ease-in-out infinite;
-  animation-delay: var(--delay, 0s);
-  will-change: opacity, transform;
-  contain: strict; /* isolasi layout agar tidak trigger reflow global */
-}
-@keyframes twinkle {
-  0%,100% { opacity: 0.15; transform: scale(1); }
-  50%      { opacity: 0.9;  transform: scale(1.4); }
-}
-
-/* ══════════════════════════════
-   FLOATING PIXEL BLOCKS BG
-══════════════════════════════ */
-.bg-blocks {
-  position: fixed; inset: 0; z-index: 0;
-  pointer-events: none; overflow: hidden;
-}
-.bg-block {
-  position: absolute; width: 32px; height: 32px;
-  border: 2px solid rgba(255,255,255,0.06); border-radius: 4px;
-  animation: floatBlock var(--dur, 8s) ease-in-out infinite;
-  animation-delay: var(--delay, 0s);
-  opacity: 0.15; font-size: 18px;
-  display: flex; align-items: center; justify-content: center;
-  will-change: transform;
-  contain: layout style; /* cegah block ini mempengaruhi layout elemen lain */
-}
-@keyframes floatBlock {
-  0%,100% { transform: translateY(0px) rotate(0deg); }
-  33%      { transform: translateY(-14px) rotate(5deg); }
-  66%      { transform: translateY(-6px) rotate(-3deg); }
-}
-
-/* ══════════════════════════════
-   NAVBAR
-══════════════════════════════ */
+.stars { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.star  { position:absolute; background:#fff; border-radius:50%;
+  animation: twinkle var(--dur,3s) ease-in-out infinite; animation-delay:var(--delay,0s); }
+@keyframes twinkle { 0%,100%{opacity:.1;} 50%{opacity:.75;} }
+.bg-blocks { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.bg-block { position:absolute; width:26px; height:26px;
+  border:2px solid rgba(255,255,255,0.05); border-radius:4px;
+  font-size:15px; display:flex; align-items:center; justify-content:center;
+  opacity:.09; animation:floatB var(--dur,8s) ease-in-out infinite; animation-delay:var(--delay,0s); }
+@keyframes floatB { 0%,100%{transform:translateY(0) rotate(0);} 50%{transform:translateY(-12px) rotate(6deg);} }
 nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
-  height: 58px; display: flex; align-items: center;
-  justify-content: space-between; padding: 0 24px;
-  background: rgba(10, 25, 40, 0.88); backdrop-filter: blur(16px);
+  position: sticky; top:0; z-index:500; height:52px;
+  display:flex; align-items:center; justify-content:space-between; padding:0 20px;
+  background: rgba(10,25,40,0.92); backdrop-filter:blur(16px);
   border-bottom: 3px solid var(--grass);
   box-shadow: 0 3px 0 var(--grass2), 0 6px 20px rgba(0,0,0,0.4);
 }
-.brand { display: flex; align-items: center; gap: 10px; }
+.brand { display:flex; align-items:center; gap:10px; }
 .brand-icon {
-  width: 36px; height: 36px;
-  background: linear-gradient(135deg, var(--grass), var(--ground));
-  border-radius: 8px; border: 2px solid var(--grass2);
-  box-shadow: inset 0 -3px 0 rgba(0,0,0,0.3), 0 4px 12px rgba(74,158,47,0.3);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; overflow: hidden;
+  width:32px; height:32px; background:linear-gradient(135deg,var(--grass),#1d4a10);
+  border-radius:8px; border:2px solid var(--grass2);
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,0.3),0 4px 10px rgba(74,158,47,0.3);
+  display:flex; align-items:center; justify-content:center; font-size:16px;
 }
-.brand-text { display: flex; flex-direction: column; gap: 0; }
-.brand-name { font-family: 'Press Start 2P', 'Courier New', monospace; font-size: 10px; letter-spacing: 1px; line-height: 1.2; }
-.brand-name .green { color: var(--grass); }
-.brand-name .white { color: #fff; }
-.brand-sub { font-size: 10px; font-weight: 700; color: var(--dim); letter-spacing: 0.5px; margin-top: 1px; }
-.nav-right { display: flex; align-items: center; gap: 8px; }
-
-.px-btn {
-  font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 800;
-  letter-spacing: 0.5px; padding: 6px 14px; border-radius: 6px;
-  cursor: pointer; border: none; transition: all 0.1s;
-  text-decoration: none; display: inline-block;
+.brand-name { font-family:'Press Start 2P',monospace; font-size:9px; letter-spacing:1px; line-height:1; }
+.brand-name .g { color:var(--grass); } .brand-name .w { color:#fff; }
+.brand-sub  { font-size:9px; font-weight:700; color:var(--dim); margin-top:2px; }
+.nav-back {
+  font-size:10px; font-weight:800; padding:5px 14px; border-radius:6px; cursor:pointer;
+  background:transparent; border:2px solid rgba(255,255,255,0.1); color:var(--dim);
+  text-decoration:none; transition:all .15s;
 }
-.px-btn:active { transform: translateY(2px); }
-.px-btn.outline {
-  background: transparent; border: 2px solid rgba(255,255,255,0.15); color: var(--dim);
-}
-.px-btn.outline:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
-.px-btn.solid {
-  background: linear-gradient(180deg, var(--gold) 0%, var(--gold2) 100%);
-  color: #000; box-shadow: 0 3px 0 #b07800, 0 4px 12px rgba(255,215,0,0.25);
-}
-.px-btn.solid:hover {
-  background: linear-gradient(180deg, #ffe033 0%, #ffbb00 100%);
-  box-shadow: 0 4px 0 #b07800, 0 6px 16px rgba(255,215,0,0.35);
-  transform: translateY(-1px);
-}
-
-/* ══════════════════════════════
-   BILLBOARD 3D BLOCK
-══════════════════════════════ */
-.billboard-zone {
-  position: relative; z-index: 10;
-  max-width: 760px; margin: 0 auto;
-  /* FIX: tambah margin-top = tinggi navbar (58px) agar tidak tertutup */
-  margin-top: 58px;
-  padding: 32px 24px 0;
-}
-
-/* TIANG kiri & kanan */
-.bb-posts {
-  display: flex; justify-content: space-between;
-  padding: 0 56px;
-}
-.bb-post {
-  width: 22px; height: 28px;
-  background: linear-gradient(180deg, #5a9e3a 0%, #2d6b1a 40%, #1a3d10 100%);
-  border-left:  2px solid rgba(255,255,255,0.18);
-  border-right: 2px solid rgba(0,0,0,0.5);
-  box-shadow: 2px 0 6px rgba(0,0,0,0.5);
-  position: relative;
-}
-/* cap atas tiang */
-.bb-post::before {
-  content: '';
-  position: absolute; top: -8px; left: -5px; right: -5px; height: 10px;
-  background: linear-gradient(180deg, #7ed44a 0%, #4a9e2f 100%);
-  border-radius: 4px 4px 0 0;
-  border: 1px solid rgba(255,255,255,0.25);
-  box-shadow: 0 -2px 6px rgba(74,158,47,0.3);
-}
-
-/* PAPAN UTAMA */
-.bb-board {
-  position: relative; z-index: 2;
-  border-radius: 10px;
-  border: 3px solid rgba(255,255,255,0.13);
-  box-shadow:
-    5px 5px 0 rgba(0,0,0,0.55),
-    10px 10px 0 rgba(0,0,0,0.22),
-    0 24px 60px rgba(0,0,0,0.65),
-    inset 0 1px 0 rgba(255,255,255,0.18),
-    inset 0 -2px 0 rgba(0,0,0,0.35);
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.bb-board:hover {
-  transform: translateY(-3px);
-  box-shadow:
-    5px 8px 0 rgba(0,0,0,0.55),
-    10px 14px 0 rgba(0,0,0,0.22),
-    0 32px 70px rgba(0,0,0,0.7),
-    inset 0 1px 0 rgba(255,255,255,0.18),
-    inset 0 -2px 0 rgba(0,0,0,0.35);
-}
-
-/* shine overlay permanen */
-.bb-board::after {
-  content: '';
-  position: absolute; inset: 0; z-index: 10;
-  background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, transparent 40%);
-  pointer-events: none; border-radius: inherit;
-}
-
-/* SLIDE CONTAINER */
-.bb-slides {
-  position: relative;
-  width: 100%; height: 200px;
-  overflow: hidden;
-  background: #000;
-}
-
-/* tiap slide = gambar penuh */
-.bb-slide {
-  position: absolute; inset: 0;
-  opacity: 0;
-  transition: opacity 0.7s ease;
-}
-.bb-slide.active { opacity: 1; }
-
-/* gambar mengisi seluruh slide */
-.bb-slide-img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-  user-select: none; -webkit-user-drag: none;
-}
-
-/* fallback jika img kosong — warna solid + emoji besar tengah */
-.bb-slide-fallback {
-  width: 100%; height: 100%;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 10px;
-}
-.bb-slide-fallback-icon { font-size: 52px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.6)); }
-.bb-slide-fallback-text {
-  font-family: 'Press Start 2P', monospace; font-size: 11px; color: #fff;
-  text-shadow: 2px 2px 0 rgba(0,0,0,0.6); text-align: center; line-height: 1.8;
-}
-
-/* overlay teks di atas gambar (opsional, muncul di bawah gambar) */
-.bb-slide-overlay {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: linear-gradient(0deg, rgba(0,0,0,0.72) 0%, transparent 100%);
-  padding: 18px 18px 10px;
-  pointer-events: none;
-}
-.bb-slide-label {
-  font-family: 'Press Start 2P', monospace; font-size: 8px;
-  color: #fff; text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
-  letter-spacing: 0.5px; opacity: 0.9;
-}
-
-/* BOTTOM BAR */
-.bb-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 7px 14px;
-  background: rgba(0,0,0,0.55);
-  border-top: 1px solid rgba(255,255,255,0.07);
-}
-.bb-dots { display: flex; gap: 5px; align-items: center; }
-.bb-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: rgba(255,255,255,0.22); border: none; padding: 0; cursor: pointer;
-  transition: all 0.2s;
-}
-.bb-dot.active { width: 18px; border-radius: 3px; background: var(--grass); }
-.bb-counter {
-  font-family: 'Press Start 2P', monospace; font-size: 7px;
-  color: rgba(255,255,255,0.35); letter-spacing: 1px;
-}
-
-/* ALAS BAWAH papan */
-.bb-base {
-  height: 10px;
-  background: linear-gradient(180deg, #1e4010 0%, #122a0a 100%);
-  border: 2px solid rgba(0,0,0,0.5);
-  border-top: none; margin: 0 18px;
-  border-radius: 0 0 5px 5px;
-  box-shadow: 0 5px 10px rgba(0,0,0,0.5);
-}
-
-/* ══════════════════════════════
-   GROUND DIVIDER
-══════════════════════════════ */
-.ground-divider {
-  position: relative; z-index: 10; max-width: 760px;
-  margin: 0 auto 28px; padding: 0 24px;
-  height: 28px; display: flex; gap: 4px; align-items: flex-end;
-}
-.grass-block {
-  flex: 1; height: 100%;
-  background: linear-gradient(180deg, var(--grass) 30%, var(--grass2) 100%);
-  border-radius: 4px 4px 0 0; border: 2px solid rgba(255,255,255,0.12);
-  border-bottom: none; box-shadow: inset 0 4px 0 rgba(255,255,255,0.15);
-  position: relative;
-}
-.grass-block::before {
-  content: ''; position: absolute; top: -5px; left: 25%;
-  width: 2px; height: 6px; background: #6bd44a; border-radius: 99px;
-  box-shadow: 6px 2px 0 #6bd44a, -5px 1px 0 #6bd44a;
-}
-
-/* ══════════════════════════════
-   TICKER
-══════════════════════════════ */
-.ticker-zone {
-  position: relative; z-index: 10; max-width: 760px;
-  margin: 0 auto 28px; padding: 0 24px;
-}
+.nav-back:hover { border-color:rgba(255,255,255,0.28); color:#fff; }
+.page { position:relative; z-index:10; max-width:760px; margin:0 auto; padding:24px 16px 60px; }
 .ticker-wrap {
-  display: flex; align-items: center;
-  background: rgba(0,0,0,0.35); border: 2px solid rgba(74,158,47,0.3);
-  border-radius: 10px; overflow: hidden;
+  display:flex; align-items:center;
+  background:rgba(0,0,0,0.3); border:2px solid rgba(74,158,47,0.3);
+  border-radius:10px; overflow:hidden; margin-bottom:22px;
 }
-.ticker-tag {
-  flex-shrink: 0;
-  background: linear-gradient(180deg, var(--grass) 0%, var(--grass2) 100%);
-  color: #fff; font-family: 'Press Start 2P', monospace; font-size: 7px;
-  padding: 8px 12px; letter-spacing: 1px;
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
-  border-right: 2px solid rgba(255,255,255,0.1);
+.ticker-tag { flex-shrink:0; background:linear-gradient(180deg,var(--grass),var(--grass2));
+  color:#fff; font-family:'Press Start 2P',monospace; font-size:6px; padding:7px 10px;
+  letter-spacing:1px; border-right:2px solid rgba(255,255,255,0.1); }
+.ticker-scroll { overflow:hidden; flex:1; padding:7px 0; }
+.ticker-inner { display:inline-block; animation:ticker 16s linear infinite;
+  font-size:10px; font-weight:800; color:#b8e8a0; white-space:nowrap; }
+.ticker-inner span { padding:0 28px; }
+@keyframes ticker { 0%{transform:translateX(0);} 100%{transform:translateX(-50%);} }
+.provider-section {
+  background: var(--card); border: 2px solid var(--border); border-radius: 16px;
+  padding: 18px; backdrop-filter: blur(8px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5); margin-bottom: 20px;
+  animation: fadeUp .4s ease both;
 }
-.ticker-scroll { overflow: hidden; flex: 1; padding: 8px 0; }
-.ticker-inner {
-  display: inline-block; animation: ticker 20s linear infinite;
-  font-size: 11px; font-weight: 800; color: #b8e8a0; white-space: nowrap;
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px);} to{opacity:1;transform:translateY(0);} }
+.ps-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.ps-title-row { display:flex; align-items:center; gap:8px; }
+.ps-icon { font-size:20px; }
+.ps-title { font-family:'Press Start 2P',monospace; font-size:9px; color:var(--gold);
+  text-shadow:2px 2px 0 rgba(0,0,0,0.5); }
+.ps-count { font-size:10px; font-weight:800; color:var(--dim);
+  background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.07);
+  border-radius:99px; padding:3px 10px; }
+.ps-search-row { display:flex; gap:8px; margin-bottom:12px; }
+.ps-search {
+  flex:1; background:rgba(0,0,0,0.4); border:2px solid rgba(74,158,47,0.2);
+  border-radius:8px; padding:8px 14px; color:var(--text);
+  font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; outline:none;
+  transition:border-color .2s;
 }
-.ticker-inner span { padding: 0 32px; }
-@keyframes ticker {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+.ps-search::placeholder { color:var(--dim); font-weight:600; }
+.ps-search:focus { border-color:rgba(74,158,47,0.55); }
+.ps-cats { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+.ps-cat {
+  font-size:10px; font-weight:800; padding:4px 12px; border-radius:99px; cursor:pointer;
+  border:2px solid rgba(74,158,47,0.2); color:var(--dim); background:transparent;
+  transition:all .15s;
 }
+.ps-cat:hover:not(.active) { border-color:rgba(74,158,47,0.4); color:var(--text); }
+.ps-cat.active {
+  background:linear-gradient(180deg,var(--grass),var(--grass2));
+  border-color:var(--grass2); color:#fff; box-shadow:0 2px 0 var(--grass2);
+}
+.ps-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:8px; }
+.pcard {
+  background:rgba(0,0,0,0.35); border:2px solid rgba(74,158,47,0.15);
+  border-radius:12px; padding:12px 10px; cursor:pointer; position:relative; overflow:hidden;
+  transition:all .18s; display:flex; flex-direction:column; align-items:center; gap:4px;
+  animation:fadeUp .35s ease both;
+}
+.pcard:hover { border-color:rgba(74,158,47,0.45); background:rgba(74,158,47,0.08); transform:translateY(-2px); }
+.pcard.active {
+  border-color:var(--grass); background:rgba(74,158,47,0.15);
+  box-shadow:0 0 16px rgba(74,158,47,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.pcard.soon { opacity:.45; cursor:not-allowed; }
+.pcard.soon:hover { transform:none; border-color:rgba(74,158,47,0.15); background:rgba(0,0,0,0.35); }
+.pcard-emoji { font-size:28px; line-height:1; }
+.pcard-name  { font-size:11px; font-weight:800; color:#fff; text-align:center; line-height:1.2; }
+.pcard-drop  { font-size:9px; font-weight:700; color:var(--dim); text-align:center; }
+.pcard.active .pcard-drop { color:var(--green); }
+.pcard-badge {
+  position:absolute; top:6px; right:6px;
+  font-size:7px; font-weight:800; padding:2px 5px; border-radius:4px; letter-spacing:.5px;
+}
+.badge-new  { background:rgba(74,158,47,0.25); border:1px solid rgba(74,158,47,0.4); color:var(--green); }
+.badge-soon { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:var(--dim); }
+.badge-active {
+  position:absolute; bottom:6px; right:6px; font-size:14px; line-height:1;
+  animation:pulseCheck .8s ease-in-out infinite alternate;
+}
+@keyframes pulseCheck { from{opacity:.6;} to{opacity:1;} }
+.ps-empty { text-align:center; padding:2rem; color:var(--dim); font-size:12px; font-weight:700; grid-column:1/-1; }
+.ps-selected {
+  display:flex; align-items:center; gap:10px;
+  background:rgba(74,158,47,0.1); border:2px solid rgba(74,158,47,0.3);
+  border-radius:10px; padding:10px 14px; margin-top:14px;
+}
+.ps-sel-emoji { font-size:24px; }
+.ps-sel-info  { flex:1; }
+.ps-sel-name  { font-size:13px; font-weight:800; color:#fff; }
+.ps-sel-desc  { font-size:10px; font-weight:700; color:var(--dim); margin-top:2px; }
+.ps-sel-badge {
+  font-family:'Press Start 2P',monospace; font-size:7px; padding:4px 8px; border-radius:4px;
+  background:rgba(74,158,47,0.25); border:1px solid rgba(74,158,47,0.4); color:var(--green);
+}
+.config-card {
+  background:var(--card); border:2px solid var(--border); border-radius:14px;
+  padding:16px; backdrop-filter:blur(8px);
+  box-shadow:0 12px 40px rgba(0,0,0,0.5); margin-bottom:20px;
+  animation:fadeUp .45s ease both;
+}
+.sec-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.sec-icon   { font-size:20px; }
+.sec-title  { font-family:'Press Start 2P',monospace; font-size:9px; color:var(--gold);
+  text-shadow:2px 2px 0 rgba(0,0,0,0.5); }
+.config-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media(max-width:480px){ .config-grid{grid-template-columns:1fr;} .ps-grid{grid-template-columns:repeat(3,1fr);} }
+.field { display:flex; flex-direction:column; gap:5px; }
+label { font-family:'Press Start 2P',monospace; font-size:6px; letter-spacing:1px; color:var(--dim); text-transform:uppercase; }
+input[type=number] {
+  width:100%; background:rgba(0,0,0,0.4); border:2px solid rgba(74,158,47,0.2);
+  border-radius:8px; padding:8px 12px; color:var(--text);
+  font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; outline:none;
+  text-align:center; transition:border-color .2s; -webkit-appearance:none; appearance:none;
+}
+input[type=number]:focus { border-color:rgba(74,158,47,0.6); box-shadow:0 0 0 3px rgba(74,158,47,0.1); }
+.results-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:20px; }
+@media(max-width:480px){ .results-grid{grid-template-columns:1fr;} }
+.ric {
+  background:var(--card); border:2px solid var(--border); border-radius:12px;
+  padding:12px 14px; backdrop-filter:blur(6px);
+  animation:fadeUp .4s ease both; transition:border-color .2s, transform .15s;
+}
+.ric:hover { border-color:rgba(74,158,47,0.45); transform:translateY(-2px); }
+.ric-top  { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.ric-name { font-size:12px; font-weight:800; color:#fff; }
+.ric-sub  { font-size:9px; font-weight:700; color:var(--dim); }
+.ric-qty  { font-family:'Press Start 2P',monospace; font-size:14px;
+  color:var(--gold); text-shadow:0 0 10px rgba(255,215,0,0.3),2px 2px 0 rgba(0,0,0,0.5); }
+.ric-pct  { font-size:9px; font-weight:700; color:var(--dim); margin-top:3px; }
 
-/* ══════════════════════════════
-   TOOLS SECTION
-══════════════════════════════ */
-.tools-section {
-  position: relative; z-index: 10; max-width: 760px;
-  margin: 0 auto; padding: 0 24px 80px;
+/* ══ CRAFTING BUTTON ══ */
+.ric-crafting {
+  background:var(--card); border:2px solid var(--border); border-radius:12px;
+  padding:12px 14px; backdrop-filter:blur(6px);
+  animation:fadeUp .4s ease both; transition:border-color .2s, transform .15s;
+  display:flex; flex-direction:row; align-items:center; justify-content:flex-start;
+  gap:8px; cursor:pointer;
 }
-.section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-.section-icon { font-size: 20px; }
-.section-title {
-  font-family: 'Press Start 2P', monospace; font-size: 11px;
-  color: var(--gold); text-shadow: 2px 2px 0 rgba(0,0,0,0.5); letter-spacing: 1px;
+.ric-crafting:hover { 
+  border-color:rgba(74,158,47,0.45); 
+  transform:translateY(-2px);
+  background:rgba(74,158,47,0.08);
 }
-.section-count {
-  margin-left: auto; font-size: 11px; font-weight: 800; color: var(--dim);
-  background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 99px; padding: 3px 10px;
-}
+.ric-crafting-icon { font-size:18px; flex-shrink:0; }
+.ric-crafting-text { font-size:11px; font-weight:700; color:var(--dim); white-space:nowrap; }
 
-/* ══════════════════════════════
-   CAROUSEL
-══════════════════════════════ */
-.carousel-outer {
-  position: relative; width: 100%; max-width: 760px;
-  margin: 0 auto; overflow: hidden; padding: 32px 0 36px;
+.single-result {
+  background:var(--card); border:2px solid var(--border); border-radius:12px;
+  padding:16px; text-align:center; backdrop-filter:blur(6px);
+  margin-bottom:20px; animation:fadeUp .4s ease both;
 }
-
-/* FIX: warna fade pakai transparent, bukan warna solid yang salah */
-.carousel-outer::before,
-.carousel-outer::after {
-  content: ''; position: absolute; top: 0; bottom: 0;
-  width: 100px; z-index: 5; pointer-events: none;
+.single-result .qty { font-family:'Press Start 2P',monospace; font-size:22px;
+  color:var(--gold); text-shadow:0 0 12px rgba(255,215,0,0.3),2px 2px 0 rgba(0,0,0,0.5);
+  display:block; margin:8px 0 4px; }
+.single-result .item-name { font-size:13px; font-weight:800; color:var(--dim); }
+.profit-card {
+  background:var(--card); border:2px solid var(--border); border-radius:14px;
+  padding:16px; backdrop-filter:blur(8px);
+  box-shadow:0 12px 40px rgba(0,0,0,0.5); margin-bottom:16px;
+  animation:fadeUp .5s ease both;
 }
-.carousel-outer::before {
-  left: 0;
-  background: linear-gradient(90deg, rgba(20,40,22,0.95) 0%, transparent 100%);
-}
-.carousel-outer::after {
-  right: 0;
-  background: linear-gradient(-90deg, rgba(20,40,22,0.95) 0%, transparent 100%);
-}
-
-.carousel-track {
-  display: flex; align-items: center; justify-content: center;
-  gap: 0; transition: none; min-height: 160px; position: relative;
-}
-
-/* ARROW BUTTONS */
-.car-arrow {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  z-index: 20; width: 38px; height: 38px; border-radius: 50%;
-  background: rgba(74,158,47,0.18); border: 2px solid rgba(74,158,47,0.4);
-  color: #a0e070; font-size: 24px; line-height: 1; cursor: pointer;
-  transition: all .15s; display: flex; align-items: center; justify-content: center;
-}
-.car-arrow:hover {
-  background: rgba(74,158,47,0.4); border-color: rgba(74,158,47,0.8);
-  color: #fff; box-shadow: 0 0 16px rgba(74,158,47,0.3);
-}
-.car-left  { left: 4px; }
-.car-right { right: 4px; }
-
-/* FLOAT ANIMATIONS */
-@keyframes floatItem0 { 0%,100%{transform:translateY(0px);}    50%{transform:translateY(-10px);} }
-@keyframes floatItem1 { 0%,100%{transform:translateY(-4px);}   50%{transform:translateY(-13px);} }
-@keyframes floatItem2 { 0%,100%{transform:translateY(-2px);}   50%{transform:translateY(-8px);}  }
-@keyframes floatItem3 { 0%,100%{transform:translateY(-6px);}   50%{transform:translateY(-14px);} }
-@keyframes floatItem4 { 0%,100%{transform:translateY(-1px);}   50%{transform:translateY(-11px);} }
-
-.car-item {
-  flex-shrink: 0; display: flex; flex-direction: column;
-  align-items: center; gap: 10px; cursor: pointer; position: absolute;
-  transition: opacity .35s cubic-bezier(.4,0,.2,1), left .35s cubic-bezier(.4,0,.2,1);
-}
-.car-item[data-slot="0"] { animation: floatItem0 3.2s ease-in-out infinite; }
-.car-item[data-slot="1"] { animation: floatItem1 2.9s ease-in-out infinite; }
-.car-item[data-slot="2"] { animation: floatItem2 3.5s ease-in-out infinite; }
-.car-item[data-slot="3"] { animation: floatItem3 3.0s ease-in-out infinite; }
-.car-item[data-slot="4"] { animation: floatItem4 3.3s ease-in-out infinite; }
-
-.car-icon-box {
-  border-radius: 18px; display: flex; align-items: center; justify-content: center;
-  border: 2px solid rgba(255,255,255,0.1);
-  box-shadow: 0 8px 0 rgba(0,0,0,0.4), 0 12px 24px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.12);
-  transition: box-shadow .35s, border-color .35s;
-  position: relative; overflow: hidden;
-}
-.car-icon-box::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(160deg, rgba(255,255,255,0.18) 0%, transparent 55%);
-  pointer-events: none; border-radius: inherit;
-}
-.car-icon-box img {
-  width: 80%; height: 80%; object-fit: contain;
-  image-rendering: pixelated; position: relative; z-index: 1;
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
-}
-.car-item.is-center .car-icon-box {
-  border-color: rgba(74,158,47,0.7);
-  box-shadow: 0 10px 0 rgba(0,0,0,0.45), 0 16px 32px rgba(0,0,0,0.55),
-              0 0 30px rgba(74,158,47,0.3), inset 0 2px 0 rgba(255,255,255,0.18);
-}
-.car-item.is-center .car-icon-box::before {
-  content: ''; position: absolute; bottom: -18px; left: 10%; right: 10%;
-  height: 12px; background: radial-gradient(ellipse, rgba(0,0,0,0.35) 0%, transparent 70%);
-  border-radius: 50%; pointer-events: none; z-index: 0;
-}
-.car-label {
-  font-family: 'Press Start 2P', monospace; font-weight: 700; color: var(--dim);
-  letter-spacing: 0.5px; transition: color .35s; white-space: nowrap;
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.6);
-}
-.car-item.is-center .car-label { color: var(--gold); }
-
-.car-badge {
-  position: absolute; top: -6px; right: -6px;
-  font-family: 'Press Start 2P', monospace; font-size: 6px;
-  padding: 3px 6px; border-radius: 5px; z-index: 3;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-}
-.cbadge-active { background:rgba(74,158,47,0.95); color:#fff; border:1px solid rgba(107,212,74,0.6); }
-.cbadge-soon   { background:rgba(40,40,55,0.95);  color:#888; border:1px solid rgba(100,100,120,0.4); }
-.cbadge-new    { background:rgba(255,184,0,0.95);  color:#000; border:1px solid rgba(255,215,0,0.6); }
-
-/* INFO PANEL */
-.tool-info-panel {
-  display: flex; align-items: center; gap: 14px;
-  background: rgba(8,22,12,0.75); border: 2px solid rgba(74,158,47,0.3);
-  border-radius: 14px; padding: 14px 18px;
-  max-width: 760px; margin: 0 auto 14px;
-  backdrop-filter: blur(8px); box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-  animation: fadeUp .3s ease;
-}
-@keyframes fadeUp { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
-
-/* FIX: tip-icon ukuran tetap agar tidak layout shift saat gambar load */
-.tip-icon {
-  min-width: 44px; min-height: 44px; width: 44px; height: 44px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 32px; line-height: 1;
-  filter: drop-shadow(0 4px 8px rgba(74,158,47,0.3));
-  flex-shrink: 0;
-}
-.tip-icon img {
-  width: 100%; height: 100%; object-fit: contain;
-  image-rendering: pixelated;
-}
-
-.tip-body { flex: 1; min-width: 0; }
-.tip-name {
-  font-family: 'Press Start 2P', monospace; font-size: 10px; color: #fff;
-  text-shadow: 2px 2px 0 rgba(0,0,0,0.5); margin-bottom: 5px;
-}
-.tip-desc { font-size: 11px; font-weight: 700; color: var(--dim); line-height: 1.4; }
-.tip-right { display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0; }
-
-.tip-badge { font-family:'Press Start 2P',monospace; font-size:7px; padding:3px 8px; border-radius:4px; }
-.tip-badge.active { background:rgba(74,158,47,0.2); border:1px solid rgba(74,158,47,0.4); color:var(--grass); }
-.tip-badge.soon   { background:rgba(60,60,80,0.5);  border:1px solid rgba(100,100,120,0.3); color:#888; }
-.tip-badge.new    { background:rgba(255,184,0,0.2); border:1px solid rgba(255,215,0,0.4); color:var(--gold); }
-
-.tip-btn {
-  font-size:11px; font-weight:800; padding:6px 14px; border-radius:8px; cursor:pointer;
-  background:linear-gradient(180deg,rgba(74,158,47,0.3),rgba(45,90,27,0.3));
-  border:2px solid rgba(74,158,47,0.4); color:#a0e070; text-decoration:none;
-  transition:all .15s; white-space:nowrap;
-}
-.tip-btn:hover { background:linear-gradient(180deg,rgba(74,158,47,0.55),rgba(45,90,27,0.55)); color:#fff; }
-.tip-btn.disabled { opacity:.3; pointer-events:none; cursor:not-allowed; }
-
-/* DOT INDICATORS */
-.car-dots { display:flex; justify-content:center; gap:5px; margin-top:4px; }
-.car-dot {
-  width:6px; height:6px; border-radius:50%;
-  background:rgba(255,255,255,0.15); border:none; padding:0; cursor:pointer; transition:all .2s;
-}
-.car-dot.active { background:var(--grass); width:18px; border-radius:3px; }
-
-/* ══════════════════════════════
-   ICON IMAGE SYSTEM
-══════════════════════════════ */
-.icon-img { width:100%; height:100%; object-fit:contain; image-rendering:pixelated; display:block; }
-.icon-img.hidden { display:none; }
-
-/* ══════════════════════════════
-   DIRT FLOOR
-══════════════════════════════ */
-.dirt-floor {
-  position:relative; z-index:10; max-width:760px;
-  margin:0 auto; padding:0 24px; height:16px; display:flex; gap:4px;
-}
-.dirt-block {
-  flex:1; height:100%;
-  background:linear-gradient(180deg,var(--dirt) 0%,#3a2010 100%);
-  border-radius:0 0 4px 4px; border:2px solid rgba(255,255,255,0.06); border-top:none;
-}
-
-/* ══════════════════════════════
-   FOOTER
-══════════════════════════════ */
-footer {
-  position:relative; z-index:10; max-width:760px;
-  margin:12px auto 0; padding:20px 24px 40px;
-  display:flex; flex-direction:column; align-items:center; gap:6px;
-}
-.footer-logo { font-family:'Press Start 2P',monospace; font-size:9px; color:var(--dim); letter-spacing:1px; }
-.footer-logo span { color:var(--grass); }
-.footer-sub { font-size:11px; font-weight:700; color:rgba(100,150,100,0.5); letter-spacing:0.5px; }
-
-/* ══════════════════════════════
-   ABOUT MODAL
-══════════════════════════════ */
-.modal-overlay {
-  position:fixed; inset:0; z-index:900;
-  background:rgba(0,0,0,0.7); backdrop-filter:blur(6px);
-  -webkit-backdrop-filter:blur(6px);
-  display:flex; align-items:center; justify-content:center; padding:24px;
-  opacity:0; pointer-events:none; transition:opacity 0.25s ease;
-}
-.modal-overlay.open { opacity:1; pointer-events:all; }
-.modal-box {
-  position:relative; width:100%; max-width:480px; min-height:260px;
-  background:linear-gradient(160deg, #0e2218 0%, #0a1a10 100%);
-  border:2px solid rgba(74,158,47,0.45); border-radius:16px;
-  box-shadow:0 0 0 1px rgba(74,158,47,0.1), 0 24px 60px rgba(0,0,0,0.7), 0 0 40px rgba(74,158,47,0.08);
-  padding:28px 28px 32px;
-  transform:translateY(20px) scale(0.97);
-  transition:transform 0.28s cubic-bezier(.4,0,.2,1);
-}
-.modal-overlay.open .modal-box { transform:translateY(0) scale(1); }
-.modal-topbar {
+.total-revenue-bar {
   display:flex; align-items:center; justify-content:space-between;
-  margin-bottom:20px; padding-bottom:14px;
-  border-bottom:2px solid rgba(74,158,47,0.18);
+  background:rgba(0,0,0,0.3); border:2px solid rgba(74,158,47,0.15);
+  border-radius:10px; padding:12px 16px; margin-bottom:16px;
 }
-.modal-title {
-  font-family:'Press Start 2P',monospace; font-size:10px; color:var(--gold);
-  letter-spacing:1px; text-shadow:2px 2px 0 rgba(0,0,0,0.5);
-  display:flex; align-items:center; gap:8px;
+.trb-label { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--dim); letter-spacing:1px; }
+.trb-val   { font-family:'Press Start 2P',monospace; font-size:14px;
+  color:var(--green); text-shadow:0 0 12px rgba(107,212,74,0.4),2px 2px 0 rgba(0,0,0,0.5);
+  display:flex; align-items:center; gap:8px; }
+.trb-wl { font-size:18px; }
+.price-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+@media(max-width:480px){ .price-grid{grid-template-columns:1fr;} }
+.pic {
+  background:rgba(0,0,0,0.3); border:2px solid rgba(74,158,47,0.12);
+  border-radius:10px; padding:12px; transition:border-color .2s;
 }
+.pic:focus-within { border-color:rgba(74,158,47,0.4); }
+.pic-header { display:flex; align-items:center; gap:7px; margin-bottom:3px; }
+.pic-name   { font-size:11px; font-weight:800; color:#fff; }
+.pic-total  { font-size:10px; font-weight:700; color:var(--dim); margin-bottom:8px; }
+.pic-price-row { display:flex; gap:6px; align-items:center; }
+.pic-price-label { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--dim); letter-spacing:1px; white-space:nowrap; }
+.pic-sw { position:relative; flex-shrink:0; }
+.pic-sw::after { content:'▾'; position:absolute; right:6px; top:50%; transform:translateY(-50%);
+  font-size:9px; color:var(--grass); pointer-events:none; }
+.pic-sw select {
+  width:auto; padding:5px 20px 5px 7px; font-size:10px; border-radius:6px;
+  background:rgba(0,0,0,0.4); border:2px solid rgba(74,158,47,0.2); color:var(--text);
+  font-family:'Nunito',sans-serif; font-weight:700; outline:none; cursor:pointer;
+  -webkit-appearance:none; appearance:none;
+}
+.pic-input {
+  flex:1; background:rgba(0,0,0,0.4); border:2px solid rgba(74,158,47,0.2);
+  border-radius:6px; padding:5px 8px; color:var(--text);
+  font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; outline:none;
+  text-align:center; transition:border-color .2s; -webkit-appearance:none; appearance:none;
+}
+.pic-input:focus { border-color:rgba(74,158,47,0.55); }
+.pic-profit { font-family:'Press Start 2P',monospace; font-size:9px; margin-top:6px; text-align:right; }
+.single-profit-area {
+  background:rgba(0,0,0,0.3); border:2px solid rgba(74,158,47,0.15);
+  border-radius:10px; padding:14px;
+}
+.sp-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+.sp-label { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--dim); white-space:nowrap; }
+.sp-sw { position:relative; }
+.sp-sw::after { content:'▾'; position:absolute; right:7px; top:50%; transform:translateY(-50%);
+  font-size:10px; color:var(--grass); pointer-events:none; }
+.sp-sw select {
+  width:auto; padding:6px 22px 6px 8px; font-size:11px; border-radius:6px;
+  background:rgba(0,0,0,0.4); border:2px solid rgba(74,158,47,0.2); color:var(--text);
+  font-family:'Nunito',sans-serif; font-weight:700; outline:none; cursor:pointer;
+  -webkit-appearance:none; appearance:none;
+}
+.sp-input {
+  flex:1; background:rgba(0,0,0,0.4); border:2px solid rgba(74,158,47,0.2);
+  border-radius:6px; padding:6px 10px; color:var(--text);
+  font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; outline:none;
+  text-align:center; transition:border-color .2s; -webkit-appearance:none; appearance:none;
+}
+.sp-input:focus { border-color:rgba(74,158,47,0.55); }
+.btn-reset {
+  width:100%; padding:11px;
+  background:linear-gradient(180deg,rgba(239,68,68,.15),rgba(180,40,40,.15));
+  border:2px solid rgba(239,68,68,.3); border-radius:8px;
+  color:#ff8888; font-family:'Nunito',sans-serif; font-size:11px; font-weight:800;
+  letter-spacing:1px; text-transform:uppercase; cursor:pointer;
+  transition:all .15s; display:flex; align-items:center; justify-content:center; gap:6px;
+  box-shadow:0 3px 0 rgba(0,0,0,.3);
+}
+.btn-reset:hover { background:linear-gradient(180deg,rgba(239,68,68,.28),rgba(180,40,40,.28));
+  border-color:rgba(239,68,68,.55); transform:translateY(-1px); }
+.btn-reset:active { transform:translateY(2px); }
+@keyframes slideInFromRight { from{opacity:0;transform:translateX(400px);} to{opacity:1;transform:translateX(0);} }
+@keyframes slideOutToRight  { from{opacity:1;transform:translateX(0);}   to{opacity:0;transform:translateX(400px);} }
+.notification-toast {
+  position:fixed; top:80px; right:20px; padding:16px 20px; border-radius:8px;
+  font-size:13px; font-weight:700; z-index:2000; max-width:320px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.5); animation:slideInFromRight .3s ease forwards;
+  white-space:pre-wrap; word-wrap:break-word; line-height:1.5;
+}
+.notification-toast.error   { background:linear-gradient(135deg,#f44336,#d32f2f); color:#fff; border:2px solid #ff6b6b; }
+.notification-toast.success { background:linear-gradient(135deg,#4caf50,#388e3c); color:#fff; border:2px solid #66bb6a; }
+.notification-toast.warning { background:linear-gradient(135deg,#ff9800,#f57c00); color:#fff; border:2px solid #ffb74d; }
+.notification-toast.hide    { animation:slideOutToRight .3s ease forwards; }
+@media(max-width:480px){ .notification-toast{top:60px;right:10px;left:10px;max-width:none;} }
+
+.ps-icon-img{
+  width:24px; height:24px; object-fit:contain; image-rendering:pixelated; flex-shrink:0;
+}
+.sec-icon-img{
+  width:24px; height:24px; object-fit:contain; image-rendering:pixelated; flex-shrink:0;
+}
+
+/* ══ CRAFTING MODAL ══ */
+.modal-overlay {
+  position:fixed; inset:0; z-index:3000;
+  background:rgba(0,0,0,0.75); backdrop-filter:blur(6px);
+  display:flex; align-items:center; justify-content:center; padding:16px;
+  animation:fadeIn .2s ease;
+}
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+.modal-box {
+  background:linear-gradient(180deg,#0d2235,#0a1a10);
+  border:2px solid rgba(74,158,47,0.4); border-radius:18px;
+  width:100%; max-width:520px; height:80vh; max-height:640px;
+  display:flex; flex-direction:column;
+  box-shadow:0 24px 60px rgba(0,0,0,0.7), 0 0 40px rgba(74,158,47,0.08);
+  animation:slideUp .25s ease;
+}
+@keyframes slideUp { from{opacity:0;transform:translateY(24px);} to{opacity:1;transform:translateY(0);} }
+.modal-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 20px; border-bottom:2px solid rgba(74,158,47,0.15); flex-shrink:0;
+}
+.modal-title { font-family:'Press Start 2P',monospace; font-size:9px; color:var(--gold); letter-spacing:1px; }
 .modal-close {
-  width:28px; height:28px; border-radius:6px;
-  background:rgba(255,255,255,0.05); border:2px solid rgba(255,255,255,0.1);
-  color:var(--dim); font-size:14px; cursor:pointer;
+  width:30px; height:30px; border-radius:8px; cursor:pointer;
+  background:rgba(239,68,68,0.15); border:2px solid rgba(239,68,68,0.3);
+  color:#ff8888; font-size:16px; display:flex; align-items:center; justify-content:center;
+  transition:all .15s;
+}
+.modal-close:hover { background:rgba(239,68,68,0.3); }
+.modal-body { overflow-y:auto; padding:16px 20px 20px; flex:1; }
+.modal-harvest-bar {
+  display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; padding:10px 12px;
+  background:rgba(0,0,0,0.3); border:1px solid rgba(74,158,47,0.15); border-radius:10px;
+}
+.mhb-item { display:flex; align-items:center; gap:4px; }
+.mhb-img { width:18px; height:18px; object-fit:contain; image-rendering:pixelated; }
+.mhb-val { font-family:'Press Start 2P',monospace; font-size:7px; }
+.mhb-sep { font-size:10px; color:rgba(255,255,255,0.15); }
+.craft-list { display:flex; flex-direction:column; gap:8px; }
+.craft-item {
+  background:rgba(0,0,0,0.3); border:2px solid rgba(74,158,47,0.12);
+  border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:12px;
+  animation:fadeUp .3s ease both;
+}
+.craft-item.craftable { border-color:rgba(74,158,47,0.35); }
+.craft-item.uncraftable { opacity:.45; }
+
+/* ── UPDATED: craft-icon supports both emoji and img ── */
+.craft-icon {
+  font-size:26px; flex-shrink:0;
+  width:36px; height:36px;
   display:flex; align-items:center; justify-content:center;
-  transition:all 0.15s; line-height:1;
 }
-.modal-close:hover { background:rgba(239,68,68,0.15); border-color:rgba(239,68,68,0.4); color:#ef4444; }
-.modal-content {
-  max-height: 60vh;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(74,158,47,0.4) transparent;
-}
-.modal-content::-webkit-scrollbar { width: 4px; }
-.modal-content::-webkit-scrollbar-track { background: transparent; }
-.modal-content::-webkit-scrollbar-thumb { background: rgba(74,158,47,0.4); border-radius: 99px; }
-
-/* ── ABOUT: header identitas ── */
-.ab-header {
-  display: flex; align-items: center; gap: 14px;
-  background: rgba(74,158,47,0.07);
-  border: 1px solid rgba(74,158,47,0.15);
-  border-radius: 10px; padding: 12px 14px; margin-bottom: 16px;
-}
-.ab-logo {
-  width: 44px; height: 44px; flex-shrink: 0;
-  background: linear-gradient(135deg, var(--grass), var(--ground));
-  border-radius: 10px; border: 2px solid var(--grass2);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
-  box-shadow: inset 0 -3px 0 rgba(0,0,0,0.3);
-}
-.ab-meta { flex: 1; min-width: 0; }
-.ab-appname {
-  font-family: 'Press Start 2P', monospace; font-size: 9px;
-  color: #fff; letter-spacing: 1px; margin-bottom: 4px;
-}
-.ab-appname span { color: var(--grass); }
-.ab-version {
-  font-size: 10px; font-weight: 800; color: var(--dim); letter-spacing: 0.5px;
+.craft-icon img {
+  width:36px; height:36px;
+  object-fit:contain; image-rendering:pixelated;
 }
 
-/* ── ABOUT: section divider ── */
-.ab-section {
-  margin-bottom: 14px;
+.craft-info { flex:1; min-width:0; }
+.craft-name { font-size:12px; font-weight:800; color:#fff; margin-bottom:4px; }
+.craft-recipe { display:flex; gap:5px; flex-wrap:wrap; }
+.chem-tag {
+  font-size:9px; font-weight:700; padding:2px 7px; border-radius:4px;
+  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
 }
-.ab-section-title {
-  font-family: 'Press Start 2P', monospace; font-size: 7px;
-  color: var(--gold); letter-spacing: 1px;
-  display: flex; align-items: center; gap: 6px;
-  margin-bottom: 8px; padding-bottom: 6px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-.ab-text {
-  font-size: 11px; font-weight: 700; color: var(--dim);
-  line-height: 1.65;
-}
-
-/* ── ABOUT: tools list ── */
-.ab-tools {
-  display: flex; flex-direction: column; gap: 5px;
-}
-.ab-tool-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 5px 8px; border-radius: 7px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.05);
-}
-.ab-tool-icon { font-size: 14px; flex-shrink: 0; width: 20px; text-align: center; }
-.ab-tool-name { flex: 1; font-size: 11px; font-weight: 800; color: #cde; }
-.ab-tool-badge {
-  font-family: 'Press Start 2P', monospace; font-size: 6px;
-  padding: 2px 6px; border-radius: 4px;
-}
-.ab-badge-active { background:rgba(74,158,47,0.2); border:1px solid rgba(74,158,47,0.4); color:var(--grass); }
-.ab-badge-soon   { background:rgba(60,60,80,0.5);  border:1px solid rgba(100,100,120,0.3); color:#666; }
-.ab-badge-new    { background:rgba(255,184,0,0.2); border:1px solid rgba(255,215,0,0.4);   color:var(--gold); }
-
-/* ── ABOUT: disclaimer box ── */
-.ab-disclaimer {
-  background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2);
-  border-radius: 8px; padding: 10px 12px;
-  font-size: 10px; font-weight: 700;
-  color: rgba(255,180,180,0.7); line-height: 1.6;
+.craft-qty-col { text-align:right; flex-shrink:0; }
+.craft-qty { font-family:'Press Start 2P',monospace; font-size:14px;
+  text-shadow:0 0 10px currentColor, 2px 2px 0 rgba(0,0,0,0.5); }
+.craft-produce { font-size:9px; font-weight:700; color:var(--dim); margin-top:3px; }
+.modal-footer {
+  padding:12px 20px; border-top:2px solid rgba(74,158,47,0.12); flex-shrink:0;
+  font-size:10px; font-weight:700; color:var(--dim); text-align:center;
 }
 
-/* ── ABOUT: contact row ── */
-.ab-contact {
-  display: flex; align-items: center; gap: 8px;
-  background: rgba(114,137,218,0.08); border: 1px solid rgba(114,137,218,0.2);
-  border-radius: 8px; padding: 10px 12px; text-decoration: none;
-  transition: all 0.15s; cursor: pointer;
+/* ══ MODAL TABS ══ */
+.modal-tabs {
+  display:flex; flex-shrink:0;
+  border-bottom:2px solid rgba(74,158,47,0.15);
 }
-.ab-contact:hover { background: rgba(114,137,218,0.16); border-color: rgba(114,137,218,0.4); }
-.ab-contact-icon { font-size: 18px; flex-shrink: 0; }
-.ab-contact-body { flex: 1; min-width: 0; }
-.ab-contact-label { font-size: 9px; font-weight: 800; color: #aab; letter-spacing: 0.5px; margin-bottom: 1px; }
-.ab-contact-val { font-family: 'Press Start 2P', monospace; font-size: 7px; color: #7289da; letter-spacing: 0.5px; }
-.ab-contact-arrow { font-size: 14px; color: #7289da; opacity: 0.7; }
+.modal-tab {
+  flex:1; padding:10px 8px; font-family:'Press Start 2P',monospace; font-size:7px;
+  letter-spacing:.5px; text-align:center; cursor:pointer; border:none; background:transparent;
+  color:var(--dim); transition:all .2s; border-bottom:3px solid transparent; margin-bottom:-2px;
+}
+.modal-tab:hover { color:var(--text); }
+.modal-tab.active { color:var(--gold); border-bottom-color:var(--gold); }
 
-/* ══════════════════════════════
-   RESPONSIVE
-══════════════════════════════ */
-@media (max-width: 520px) {
-  nav { padding: 0 14px; }
-  .bb-slides { height: 150px; }
-  .bb-slide-fallback-text { font-size: 9px; }
+/* ── slide body ── */
+.modal-slide { display:none; overflow-y:auto; padding:14px 20px 20px; flex:1; min-height:0; }
+.modal-slide.active { display:block; }
+
+/* slide 2 note */
+.mc-expand-note {
+  font-size:9px; font-weight:700; color:var(--dim); margin-bottom:12px;
+  padding:8px 10px; background:rgba(251,146,60,0.06);
+  border:1px solid rgba(251,146,60,0.2); border-radius:8px; line-height:1.6;
+}
+.mc-badge {
+  display:inline-flex; align-items:center; gap:3px;
+  font-size:9px; font-weight:700; padding:2px 7px; border-radius:4px;
+  background:rgba(251,146,60,0.15); border:1px solid rgba(251,146,60,0.4); color:#fb923c;
 }
 </style>
 </head>
 <body>
-
-<!-- FLOATING STARS -->
 <div class="stars" id="stars"></div>
-
-<!-- FLOATING PIXEL BLOCKS -->
 <div class="bg-blocks" id="bgBlocks"></div>
 
-<!-- NAVBAR -->
 <nav>
   <div class="brand">
-    <div class="brand-icon" role="img" aria-label="Growculator logo">
-      <!-- ▼ BRAND LOGO — ganti src="" dengan path/URL gambar logo kamu -->
-      <img src="" alt="Logo" class="icon-img" data-fallback="🌱" onerror="iconFallback(this)">
+    <div class="brand-icon">
+      <img src="https://cdn.growtopiawiki.com/sprites/2408.png" alt="Growculator"
+        style="width:22px;height:22px;image-rendering:pixelated;">
     </div>
-    <div class="brand-text">
-      <div class="brand-name"><span class="green">GROW</span><span class="white">CULATOR</span></div>
-      <div class="brand-sub">Growtopia Calculator Tools</div>
+    <div>
+      <div class="brand-name"><span class="g">GROW</span><span class="w">CULATOR</span></div>
+      <div class="brand-sub">Provider Calculator</div>
     </div>
   </div>
-  <div class="nav-right">
-    <button class="px-btn outline" onclick="openAbout()">About</button>
-    <!-- ▼ Ganti YOURINVITE dengan kode Discord kamu -->
-    <a class="px-btn solid" href="https://discord.com/invite/EKrRjsutwk" target="_blank" rel="noopener">DISCORD ▶</a>
-  </div>
+  <a class="nav-back" href="https://growculator.xyz">← Back</a>
 </nav>
 
-<!-- BILLBOARD 3D BLOCK -->
-<div class="billboard-zone">
-
-  <!-- TIANG -->
-  <div class="bb-posts">
-    <div class="bb-post"></div>
-    <div class="bb-post"></div>
-  </div>
-
-  <!-- PAPAN UTAMA -->
-  <div class="bb-board" id="bbBoard">
-
-    <!-- SLIDE CONTAINER -->
-    <div class="bb-slides" id="bbSlides">
-      <!-- Slide dirender oleh JS -->
-    </div>
-
-    <!-- BOTTOM BAR -->
-    <div class="bb-bar">
-      <div class="bb-dots" id="bbDots"></div>
-      <div class="bb-counter" id="bbCounter">1 / 1</div>
-    </div>
-
-  </div>
-
-  <!-- ALAS BAWAH PAPAN -->
-  <div class="bb-base"></div>
-
-</div>
-
-<!-- GROUND DIVIDER -->
-<div class="ground-divider" aria-hidden="true">
-  <div class="grass-block"></div><div class="grass-block"></div>
-  <div class="grass-block"></div><div class="grass-block"></div>
-  <div class="grass-block"></div><div class="grass-block"></div>
-  <div class="grass-block"></div><div class="grass-block"></div>
-  <div class="grass-block"></div><div class="grass-block"></div>
-  <div class="grass-block"></div><div class="grass-block"></div>
-  <div class="grass-block"></div><div class="grass-block"></div>
-</div>
-
-<!-- TICKER -->
-<div class="ticker-zone" aria-label="News ticker">
+<div class="page">
   <div class="ticker-wrap">
-    <div class="ticker-tag" aria-hidden="true">NEWS</div>
+    <div class="ticker-tag">NEWS</div>
     <div class="ticker-scroll">
       <div class="ticker-inner">
-        <span>🌱 Kalkulator Growtopia Terpercaya</span>
-        <span>🔒 Hitung Profit Farming Otomatis</span>
-        <span>⭐ Tools Terlengkap untuk Growtopia</span>
-        <span>🐔 Provider, Surgery, Autoclave & More</span>
-        <span>🌱 Kalkulator Growtopia Terpercaya</span>
-        <span>🔒 Hitung Profit Farming Otomatis</span>
-        <span>⭐ Tools Terlengkap untuk Growtopia</span>
-        <span>🐔 Provider, Surgery, Autoclave & More</span>
+        <span>
+          <img src="https://cdn.growtopiawiki.com/sprites/2408.png" alt=""
+            style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;">
+          Kalkulator Growtopia Terpercaya
+        </span>
+        <span>
+          <img src="https://cdn.growtopiawiki.com/sprites/2408.png" alt="WL"
+            style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;">
+          Hitung Profit Farming Otomatis
+        </span>
+        <span>
+          <img src="https://cdn.growtopiawiki.com/sprites/2408.png" alt=""
+            style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;">
+          Kalkulator Growtopia Terpercaya
+        </span>
+        <span>
+          <img src="https://cdn.growtopiawiki.com/sprites/2408.png" alt="WL"
+            style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;">
+          Hitung Profit Farming Otomatis
+        </span>
       </div>
     </div>
   </div>
+
+  <div class="provider-section">
+    <div class="ps-header">
+      <div class="ps-title-row">
+        <img src="https://cdn.growtopiawiki.com/sprites/486.png" alt="Provider" class="ps-icon-img">
+        <span class="ps-title">Choose Provider</span>
+      </div>
+      <span class="ps-count" id="ps_count">4 providers</span>
+    </div>
+    <div class="ps-search-row">
+      <input class="ps-search" type="text" id="ps_search" placeholder="🔍  Search provider or item..." oninput="renderProviderGrid()">
+    </div>
+    <div class="ps-cats" id="ps_cats"></div>
+    <div class="ps-grid" id="ps_grid"></div>
+    <div class="ps-selected" id="ps_selected">
+      <span class="ps-sel-emoji" id="ps_sel_emoji">🐔</span>
+      <div class="ps-sel-info">
+        <div class="ps-sel-name" id="ps_sel_name">Chicken</div>
+        <div class="ps-sel-desc" id="ps_sel_desc">Drops eggs when harvested.</div>
+      </div>
+      <span class="ps-sel-badge">ACTIVE</span>
+    </div>
+  </div>
+
+  <div class="config-card">
+    <div class="sec-header">
+      <span class="sec-icon" id="cfg_icon">🐔</span>
+      <span class="sec-title" id="cfg_title">Harvest Info</span>
+    </div>
+    <div class="config-grid">
+      <div class="field">
+        <label id="lbl_providers">Chickens</label>
+        <input type="number" id="total_providers" value="0" min="0"
+          oninput="hitungOtomatis()"
+          onfocus="if(this.value==='0')this.value=''"
+          onblur="if(this.value==='')this.value='0'" placeholder="0">
+      </div>
+      <div class="field">
+        <label>Harvest Cycles</label>
+        <input type="number" id="kali_harvest" value="1" min="1"
+          oninput="hitungOtomatis()" placeholder="1">
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-header">
+    <img src="https://cdn.growtopiawiki.com/sprites/6016.png" alt="Harvest Results" class="sec-icon-img">
+    <span class="sec-title">Harvest Results</span>
+  </div>
+  <div id="harvest_results_area"></div>
+
+  <div class="sec-header" style="margin-top:4px;">
+    <img src="https://cdn.growtopiawiki.com/sprites/242.png" alt="Profit Calculator" class="sec-icon-img">
+    <span class="sec-title">Profit Calculator</span>
+  </div>
+
+  <div class="profit-card">
+    <div class="total-revenue-bar">
+      <span class="trb-label">TOTAL REVENUE</span>
+      <span class="trb-val">
+        <span class="trb-wl">
+          <img src="https://cdn.growtopiawiki.com/sprites/242.png" alt="WL"
+            style="width:20px;height:20px;image-rendering:pixelated;vertical-align:middle;">
+        </span>
+        <span id="total_revenue">0 WL</span>
+      </span>
+    </div>
+    <div id="profit_inputs_area"></div>
+  </div>
+
+  <button class="btn-reset" onclick="resetKalkulator()">↺ Reset Data</button>
 </div>
-
-<!-- TOOLS CAROUSEL -->
-<section class="tools-section">
-  <div class="section-header">
-    <div class="section-icon" aria-hidden="true">📦</div>
-    <div class="section-title">Available Tools</div>
-    <div class="section-count" id="toolCount">07 Modules</div>
-  </div>
-
-  <div class="carousel-outer">
-    <button class="car-arrow car-left"  onclick="carMove(-1)" aria-label="Previous tool">&#8249;</button>
-    <button class="car-arrow car-right" onclick="carMove(1)"  aria-label="Next tool">&#8250;</button>
-    <div class="carousel-track" id="carTrack"></div>
-  </div>
-
-  <!-- ACTIVE TOOL INFO PANEL -->
-  <div class="tool-info-panel" id="toolInfoPanel" aria-live="polite">
-    <div class="tip-icon" id="tipIcon"></div>
-    <div class="tip-body">
-      <div class="tip-name" id="tipName">Provider</div>
-      <div class="tip-desc" id="tipDesc">Calculate providers like chicken, cow, science station & tackle box.</div>
-    </div>
-    <div class="tip-right">
-      <span class="tip-badge" id="tipBadge">ACTIVE</span>
-      <a class="tip-btn" id="tipBtn" href="growculator.html">Launch ▶</a>
-    </div>
-  </div>
-
-  <!-- DOT INDICATORS -->
-  <div class="car-dots" id="carDots" role="tablist" aria-label="Tool selector"></div>
-</section>
-
-<!-- DIRT FLOOR -->
-<div class="dirt-floor" aria-hidden="true">
-  <div class="dirt-block"></div><div class="dirt-block"></div>
-  <div class="dirt-block"></div><div class="dirt-block"></div>
-  <div class="dirt-block"></div><div class="dirt-block"></div>
-  <div class="dirt-block"></div><div class="dirt-block"></div>
-  <div class="dirt-block"></div><div class="dirt-block"></div>
-  <div class="dirt-block"></div><div class="dirt-block"></div>
-  <div class="dirt-block"></div>
-</div>
-
-<!-- ABOUT MODAL -->
-<div class="modal-overlay" id="aboutOverlay" role="dialog" aria-modal="true" aria-label="About Growculator">
-  <div class="modal-box" id="aboutBox">
-    <div class="modal-topbar">
-      <div class="modal-title">📋 About</div>
-      <button class="modal-close" onclick="closeAbout()" aria-label="Close">✕</button>
-    </div>
-    <div class="modal-content" id="aboutContent">
-
-      <!-- IDENTITAS -->
-      <div class="ab-header">
-        <div class="ab-logo">🌱</div>
-        <div class="ab-meta">
-          <div class="ab-appname"><span>GROW</span>CULATOR</div>
-          <div class="ab-version">v1.0 · Juni 2026 · Gratis Selamanya</div>
-        </div>
-      </div>
-
-      <!-- TENTANG -->
-      <div class="ab-section">
-        <div class="ab-section-title">📖 TENTANG</div>
-        <p class="ab-text">
-          Growculator dibuat untuk membantu petani Growtopia menghitung
-          profit farming dengan cepat dan akurat — tanpa perlu hitung
-          manual lagi. Semua tools tersedia gratis untuk komunitas GT.
-        </p>
-      </div>
-
-      <!-- TOOLS -->
-      <div class="ab-section">
-        <div class="ab-section-title">🧰 AVAILABLE TOOLS</div>
-        <div class="ab-tools">
-          <div class="ab-tool-row">
-            <span class="ab-tool-icon">🐔</span>
-            <span class="ab-tool-name">Provider</span>
-            <span class="ab-tool-badge ab-badge-active">ACTIVE</span>
-          </div>
-          <div class="ab-tool-row">
-            <span class="ab-tool-icon">🔬</span>
-            <span class="ab-tool-name">Surgery</span>
-            <span class="ab-tool-badge ab-badge-soon">SOON</span>
-          </div>
-          <div class="ab-tool-row">
-            <span class="ab-tool-icon">⚗️</span>
-            <span class="ab-tool-name">Autoclave</span>
-            <span class="ab-tool-badge ab-badge-soon">SOON</span>
-          </div>
-          <div class="ab-tool-row">
-            <span class="ab-tool-icon">🕵️</span>
-            <span class="ab-tool-name">Crime</span>
-            <span class="ab-tool-badge ab-badge-soon">SOON</span>
-          </div>
-          <div class="ab-tool-row">
-            <span class="ab-tool-icon">🚀</span>
-            <span class="ab-tool-name">Startopia</span>
-            <span class="ab-tool-badge ab-badge-soon">SOON</span>
-          </div>
-          <div class="ab-tool-row">
-            <span class="ab-tool-icon">🤖</span>
-            <span class="ab-tool-name">Nanoforge</span>
-            <span class="ab-tool-badge ab-badge-soon">SOON</span>
-          </div>
-          <div class="ab-tool-row">
-            <span class="ab-tool-icon">👑</span>
-            <span class="ab-tool-name">Growpass</span>
-            <span class="ab-tool-badge ab-badge-new">NEW</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- KONTAK -->
-      <div class="ab-section">
-        <div class="ab-section-title">📬 KONTAK</div>
-        <!-- ▼ Ganti href dengan link Discord kamu -->
-        <a class="ab-contact" href="https://discord.com/invite/EKrRjsutwk" target="_blank" rel="noopener">
-          <span class="ab-contact-icon">💬</span>
-          <div class="ab-contact-body">
-            <div class="ab-contact-label">Discord Server</div>
-            <!-- ▼ Ganti teks di bawah dengan nama server Discord kamu -->
-            <div class="ab-contact-val">discord.gg/Klik Me!</div>
-          </div>
-          <span class="ab-contact-arrow">›</span>
-        </a>
-      </div>
-
-      <!-- DISCLAIMER -->
-      <div class="ab-section">
-        <div class="ab-section-title">⚠️ DISCLAIMER</div>
-        <div class="ab-disclaimer">
-          Growculator is a fan-made tool and is not affiliated with,
-          endorsed by, or connected to Ubisoft or Growtopia in any way.
-          All game assets, names, and trademarks belong to their
-          respective owners.
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo"><span>GROW</span>CULATOR v1.0</div>
-  <div class="footer-sub">Built for the Growtopia Community · Always Free 🌱</div>
-</footer>
 
 <script>
-// ══════════════════════════════
-//  ABOUT MODAL
-//  FIX: definisikan lebih awal agar tidak error saat dipanggil keydown
-// ══════════════════════════════
-const aboutOverlay = document.getElementById('aboutOverlay');
-
-function openAbout() {
-  aboutOverlay.classList.add('open');
-  document.body.style.overflow = 'hidden';
+/* ── BG ── */
+const starsEl = document.getElementById('stars');
+for(let i=0;i<55;i++){
+  const s=document.createElement('div'); s.className='star';
+  const sz=Math.random()<.25?2:1;
+  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*65}%;left:${Math.random()*100}%;--dur:${2+Math.random()*3}s;--delay:${Math.random()*4}s;`;
+  starsEl.appendChild(s);
 }
-function closeAbout() {
-  aboutOverlay.classList.remove('open');
-  document.body.style.overflow = '';
-}
-aboutOverlay.addEventListener('click', e => {
-  if (e.target === aboutOverlay) closeAbout();
+const blocksEl=document.getElementById('bgBlocks');
+['🌱','🍀','⭐','🔒','💎','🪙','🍄','🌿'].forEach((e,i)=>{
+  const b=document.createElement('div'); b.className='bg-block'; b.textContent=e;
+  b.style.cssText=`top:${5+Math.random()*75}%;left:${i*12+Math.random()*8}%;--dur:${6+Math.random()*5}s;--delay:${Math.random()*5}s;`;
+  blocksEl.appendChild(b);
 });
 
-// Trigger fallback untuk img dengan src kosong saat load
-window.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('img.icon-img').forEach(img => {
-    if (!img.getAttribute('src')) iconFallback(img);
-  });
-});
-
-// ══════════════════════════════
-//  BILLBOARD DATA
-//  ▼ Setiap slide cukup isi:
-//    img   : path/URL gambar (wajib, ukuran bebas, disarankan 16:9 atau lebar)
-//    label : teks kecil di pojok kiri bawah gambar (opsional, kosongkan '')
-//    href  : link saat papan diklik (kosongkan '#' jika tidak ada)
-//    bg    : warna background jika gambar belum diisi (CSS color/gradient)
-//    fallbackIcon  : emoji besar jika gambar belum ada
-//    fallbackTitle : teks jika gambar belum ada
-// ══════════════════════════════
-const bbSlides = [
+const allProviders = [
   {
-    img:           '',
-    label:         '⭐ Growculator v1.0',
-    href:          '#',
-    bg:            'linear-gradient(135deg,#1a3d10,#0d2408)',
-    fallbackIcon:  '🌱',
-    fallbackTitle: 'GROWCULATOR\nv1.0',
+    key:'chicken', emoji:'🐔', img:'https://cdn.growtopiawiki.com/sprites/872.png', name:'Chicken', cat:'Animals',
+    label:'Chickens', icon:'🐔', badge:'new',
+    deskripsi:'When harvested it drops Eggs. Can be harvested approximately every 24 hours.',
+    multiDrop:false, namaItem:'Eggs', avgDrop:2
   },
   {
-    img:           '',
-    label:         '🐔 Provider Calculator',
-    href:          '#',
-    bg:            'linear-gradient(135deg,#1a3d10,#0d2408)',
-    fallbackIcon:  '🐔',
-    fallbackTitle: 'PROVIDER\nCALCULATOR',
+    key:'cow', emoji:'🐄', img:'https://cdn.growtopiawiki.com/sprites/866.png', name:'Cow', cat:'Animals',
+    label:'Cows', icon:'🐄', badge:'new',
+    deskripsi:'When harvested it drops Milk. Can be harvested approximately every 24 hours.',
+    multiDrop:false, namaItem:'Milk', avgDrop:2
   },
   {
-    img:           '',
-    label:         '👑 Growpass — Coming Soon',
-    href:          '#',
-    bg:            'linear-gradient(135deg,#2a1a3d,#160a2a)',
-    fallbackIcon:  '👑',
-    fallbackTitle: 'GROWPASS\nCOMING SOON',
+    key:'sheep', emoji:'🐑', img:'https://cdn.growtopiawiki.com/sprites/3888.png', name:'Sheep', cat:'Animals',
+    label:'Sheep', icon:'🐑', badge:'soon',
+    deskripsi:'When harvested it drops 1-3 Wool. Can be harvested approximately every 3 days.',
+    multiDrop:false, namaItem:'Wool', avgDrop:2
+  },
+  {
+    key:'coffee_maker', emoji:'☕', img:'https://cdn.growtopiawiki.com/sprites/1632.png', name:'Coffee Maker', cat:'Food & Drink',
+    label:'Coffee Makers', icon:'☕', badge:'soon',
+    deskripsi:'When harvested it drops Coffee. Can be harvested approximately every 24 hours.',
+    multiDrop:false, namaItem:'Coffee', avgDrop:1
+  },
+  {
+    key:'tea_set', emoji:'🍵', img:'https://cdn.growtopiawiki.com/sprites/5116.png', name:'Tea Set', cat:'Food & Drink',
+    label:'Tea Sets', icon:'🍵', badge:'soon',
+    deskripsi:'When harvested it drops Tea. Can be harvested approximately every 24 hours.',
+    multiDrop:false, namaItem:'Tea', avgDrop:1
+  },
+  {
+    key:'atm_machine', emoji:'🏧', img:'https://cdn.growtopiawiki.com/sprites/1008.png', name:'ATM Machine', cat:'Utility',
+    label:'ATM Machines', icon:'🏧', badge:'soon',
+    deskripsi:'When harvested you receive 1-100 Gems. Can be harvested approximately every 22 hours.',
+    multiDrop:false, namaItem:'Gems', avgDrop:50
+  },
+  {
+    key:'well', emoji:'🪣', img:'https://cdn.growtopiawiki.com/sprites/2798.png', name:'Well', cat:'Utility',
+    label:'Wells', icon:'🪣', badge:'soon',
+    deskripsi:'When harvested it drops Water Buckets. Can be harvested approximately every 24 hours.',
+    multiDrop:false, namaItem:'Water Buckets', avgDrop:1
+  },
+  {
+    key:'science_station', emoji:'🔬', img:'https://cdn.growtopiawiki.com/sprites/928.png', name:'Science Station', cat:'Chemistry',
+    label:'Science Stations', icon:'🔬', badge:'new',
+    deskripsi:'When harvested it drops random Chemicals. Can be harvested approximately every 12 hours.',
+    multiDrop:true,
+    drops:[
+      {key:'chem_g', name:'Chemical G', color:'#4ade80', rate:0.392072, img:'https://cdn.growtopiawiki.com/sprites/914.png'},
+      {key:'chem_r', name:'Chemical R', color:'#f87171', rate:0.247618, img:'https://cdn.growtopiawiki.com/sprites/916.png'},
+      {key:'chem_y', name:'Chemical Y', color:'#fde047', rate:0.156805, img:'https://cdn.growtopiawiki.com/sprites/924.png'},
+      {key:'chem_b', name:'Chemical B', color:'#60a5fa', rate:0.134337, img:'https://cdn.growtopiawiki.com/sprites/920.png'},
+      {key:'chem_p', name:'Chemical P', color:'#c084fc', rate:0.069168, img:'https://cdn.growtopiawiki.com/sprites/918.png'},
+    ]
+  },
+  {
+    key:'tackle_box', emoji:'🎣', img:'https://cdn.growtopiawiki.com/sprites/3044.png', name:'Tackle Box', cat:'Fishing',
+    label:'Tackle Boxes', icon:'🎣', badge:'new',
+    deskripsi:'When harvested it drops random Baits. Can be harvested approximately every 2 days.',
+    multiDrop:true,
+    drops:[
+      {key:'wiggly',     name:'Wiggly Worms',        color:'#a3e635', rate:0.308129, img:'https://cdn.growtopiawiki.com/sprites/2914.png'},
+      {key:'shiny',      name:'Shiny Flashy Things',  color:'#facc15', rate:0.246503, img:'https://cdn.growtopiawiki.com/sprites/3012.png'},
+      {key:'salmon',     name:'Salmon Eggs',          color:'#fb923c', rate:0.190971, img:'https://cdn.growtopiawiki.com/sprites/3014.png'},
+      {key:'fly',        name:'Fishing Fly',          color:'#38bdf8', rate:0.125606, img:'https://cdn.growtopiawiki.com/sprites/3016.png'},
+      {key:'shrimp',     name:'Shrimp Lure',          color:'#f472b6', rate:0.061626, img:'https://cdn.growtopiawiki.com/sprites/3018.png'},
+      {key:'uranium',    name:'Uranium Glowing Lure', color:'#86efac', rate:0.035175, img:'https://cdn.growtopiawiki.com/sprites/5526.png'},
+      {key:'megapellet', name:'Mega-Pellet Bait',     color:'#cbd5e1', rate:0.031990, img:'https://cdn.growtopiawiki.com/sprites/5528.png'},
+    ]
+  },
+  {
+    key:'star_tool_droid', emoji:'🤖', img:'https://cdn.growtopiawiki.com/sprites/6414.png', name:'Star Tool Droid', cat:'Special',
+    label:'Star Tool Droids', icon:'🤖', badge:'new',
+    deskripsi:'When harvested it drops a random Star Tool. Can be harvested approximately every 5 days.',
+    multiDrop:true,
+    drops:[
+      {key:'ai_brain',          name:'AI Brain',          color:'#9c27b0', rate:0.0589, img:'https://cdn.growtopiawiki.com/sprites/6520.png'},
+      {key:'cyborg_diplomat',   name:'Cyborg Diplomat',   color:'#3f51b5', rate:0.0621, img:'https://cdn.growtopiawiki.com/sprites/6538.png'},
+      {key:'galactibolt',       name:'Galactibolt',       color:'#2196f3', rate:0.0854, img:'https://cdn.growtopiawiki.com/sprites/6522.png'},
+      {key:'gigablaster',       name:'Gigablaster',       color:'#00bcd4', rate:0.1033, img:'https://cdn.growtopiawiki.com/sprites/6528.png'},
+      {key:'growton_torpedo',   name:'Growton Torpedo',   color:'#4caf50', rate:0.0853, img:'https://cdn.growtopiawiki.com/sprites/6540.png'},
+      {key:'hypershields',      name:'HyperShields',      color:'#ff9800', rate:0.1070, img:'https://cdn.growtopiawiki.com/sprites/6518.png'},
+      {key:'quadriscanner',     name:'Quadriscanner',     color:'#ff5722', rate:0.0834, img:'https://cdn.growtopiawiki.com/sprites/6530.png'},
+      {key:'space_meds',        name:'Space Meds',        color:'#f44336', rate:0.0801, img:'https://cdn.growtopiawiki.com/sprites/6524.png'},
+      {key:'star_supplies',     name:'Star Supplies',     color:'#ffc107', rate:0.0783, img:'https://cdn.growtopiawiki.com/sprites/6536.png'},
+      {key:'stellar_documents', name:'Stellar Documents', color:'#8bc34a', rate:0.0899, img:'https://cdn.growtopiawiki.com/sprites/6534.png'},
+      {key:'tactical_drone',    name:'Tactical Drone',    color:'#673ab7', rate:0.1061, img:'https://cdn.growtopiawiki.com/sprites/6532.png'},
+      {key:'teleporter_charge', name:'Teleporter Charge', color:'#e91e63', rate:0.0602, img:'https://cdn.growtopiawiki.com/sprites/6526.png'},
+    ]
+  },
+  {
+    key:'surgical_tool_bag', emoji:'🏥', img:'https://cdn.growtopiawiki.com/sprites/6212.png', name:'Surgical Tool Bag', cat:'Special',
+    label:'Surgical Tool Bags', icon:'🏥', badge:'soon',
+    deskripsi:'When harvested it drops a random Surgical Tool. Can be harvested approximately every 5 days.',
+    multiDrop:false, namaItem:'Surgical Tool', avgDrop:1
   },
 ];
 
-let bbCurrent = 0;
-let bbTimer   = null;
-const BB_INTERVAL = 4000;
+function distributeDrops(totalRolls, drops) {
+  const result = drops.map(d => ({ ...d, qty: Math.floor(totalRolls * d.rate) }));
+  const used      = result.reduce((s, d) => s + d.qty, 0);
+  const remainder = Math.round(totalRolls - used);
+  if (remainder > 0) {
+    const maxIdx = result.reduce((mi, d, i, a) => d.rate > a[mi].rate ? i : mi, 0);
+    result[maxIdx].qty += remainder;
+  }
+  return result;
+}
 
-function renderBillboard() {
-  const slidesEl  = document.getElementById('bbSlides');
-  const dotsEl    = document.getElementById('bbDots');
-  const counterEl = document.getElementById('bbCounter');
+function renderDropIcon(d, size='20px'){
+  if(d.img && d.img.trim()){
+    return `<img src="${d.img}" alt="${d.name}" style="width:${size};height:${size};object-fit:contain;image-rendering:pixelated;flex-shrink:0;" onerror="this.style.display='none';this.nextSibling.style.display='block'"><div style="display:none;width:${size};height:${size};border-radius:3px;background:${d.color};box-shadow:0 0 8px ${d.color}66;flex-shrink:0;"></div>`;
+  }
+  return `<div style="width:${size};height:${size};border-radius:3px;background:${d.color};box-shadow:0 0 8px ${d.color}66;flex-shrink:0;"></div>`;
+}
+function renderIcon(p, size='28px', cls=''){
+  if(p.img && p.img.trim()){
+    return `<img src="${p.img}" alt="${p.name}" style="width:${size};height:${size};object-fit:contain;image-rendering:pixelated;" class="${cls}" onerror="this.style.display='none';this.nextSibling.style.display='inline'"><span style="display:none;font-size:${size};">${p.emoji}</span>`;
+  }
+  return `<span style="font-size:${size};" class="${cls}">${p.emoji}</span>`;
+}
 
-  // Build slides
-  slidesEl.innerHTML = bbSlides.map((s, i) => {
-    const isActive = i === 0 ? ' active' : '';
-    if (s.img) {
-      // Full image slide
-      return `
-      <div class="bb-slide${isActive}" data-idx="${i}" data-href="${s.href}">
-        <img class="bb-slide-img" src="${s.img}" alt="Promo ${i+1}" draggable="false">
-        ${s.label ? `<div class="bb-slide-overlay"><div class="bb-slide-label">${s.label}</div></div>` : ''}
+const cats = ['All', ...new Set(allProviders.map(p=>p.cat))];
+let activeCat = 'All';
+let currentKey = 'chicken';
+
+const catsEl = document.getElementById('ps_cats');
+cats.forEach(c => {
+  const el = document.createElement('button');
+  el.className = 'ps-cat' + (c===activeCat?' active':'');
+  el.textContent = c;
+  el.onclick = () => { activeCat=c; renderCats(); renderProviderGrid(); };
+  catsEl.appendChild(el);
+});
+function renderCats(){
+  document.querySelectorAll('.ps-cat').forEach((el,i)=>{
+    el.classList.toggle('active', cats[i]===activeCat);
+  });
+}
+
+function renderProviderGrid(){
+  const q = document.getElementById('ps_search').value.toLowerCase();
+  const grid = document.getElementById('ps_grid');
+  const filtered = allProviders.filter(p => {
+    const matchCat = activeCat==='All' || p.cat===activeCat;
+    const matchQ   = p.name.toLowerCase().includes(q) ||
+                     (p.namaItem||'').toLowerCase().includes(q) ||
+                     (p.drops||[]).some(d=>d.name.toLowerCase().includes(q));
+    return matchCat && matchQ;
+  });
+  document.getElementById('ps_count').textContent =
+    filtered.length + ' of ' + allProviders.length + ' providers';
+  if(!filtered.length){
+    grid.innerHTML = '<div class="ps-empty">No providers found 🌱</div>'; return;
+  }
+  grid.innerHTML = filtered.map((p,fi) => {
+    const isActive  = p.key === currentKey;
+    const dropLabel = p.multiDrop ? p.drops.length + ' items' : p.namaItem;
+    const badgeHtml = p.badge==='new'
+      ? '<span class="pcard-badge badge-new">NEW</span>'
+      : p.badge==='soon'
+      ? '<span class="pcard-badge badge-soon">SOON</span>' : '';
+    const activeHtml = isActive ? '<span class="pcard-badge badge-active" style="bottom:6px;right:6px;top:auto;">✔</span>' : '';
+    return `<div class="pcard${isActive?' active':''}${p.badge==='soon'?' soon':''}"
+      style="animation-delay:${fi*0.04}s"
+      onclick="${p.badge!=='soon'?`selectProvider('${p.key}')`:''}" >
+      ${badgeHtml}${activeHtml}
+      <span class="pcard-emoji">${renderIcon(p,'36px')}</span>
+      <div class="pcard-name">${p.name}</div>
+      <div class="pcard-drop">${dropLabel}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectProvider(key){
+  currentKey = key;
+  const p = allProviders.find(x=>x.key===key);
+  document.getElementById('ps_sel_emoji').innerHTML    = renderIcon(p,'32px');
+  document.getElementById('ps_sel_name').textContent   = p.name;
+  document.getElementById('ps_sel_desc').textContent   = p.deskripsi;
+  document.getElementById('cfg_icon').innerHTML        = renderIcon(p,'22px');
+  document.getElementById('cfg_title').textContent     = p.name + ' · Harvest Info';
+  document.getElementById('lbl_providers').textContent = p.label.toUpperCase();
+  document.getElementById('total_providers').value     = '0';
+  document.getElementById('kali_harvest').value        = '1';
+  renderProviderGrid();
+  hitungOtomatis();
+}
+
+function validateInputs(){
+  const errors = [];
+  const total  = document.getElementById('total_providers').value.trim();
+  const siklus = document.getElementById('kali_harvest').value.trim();
+  if(!total)           errors.push('Total provider tidak boleh kosong');
+  else if(isNaN(total)) errors.push('Total provider harus berupa angka');
+  else {
+    const n = parseFloat(total);
+    if(n < 0)      errors.push('Total provider tidak boleh negatif');
+    if(n > 999999) errors.push('Total provider terlalu besar (max 999.999)');
+  }
+  if(!siklus)            errors.push('Harvest cycles tidak boleh kosong');
+  else if(isNaN(siklus)) errors.push('Harvest cycles harus berupa angka');
+  else {
+    const n = parseInt(siklus);
+    if(n < 1)   errors.push('Harvest cycles minimal 1');
+    if(n > 365) errors.push('Harvest cycles tidak boleh lebih dari 365');
+  }
+  return { valid: errors.length===0, errors };
+}
+function showNotification(message, type='error', duration=4000){
+  const existing = document.querySelector('.notification-toast:not(.hide)');
+  if(existing){ existing.classList.add('hide'); setTimeout(()=>existing.remove(),300); }
+  const toast = document.createElement('div');
+  toast.className = `notification-toast ${type}`;
+  toast.textContent = `${type==='success'?'✅':type==='warning'?'⚠️':'❌'} ${message}`;
+  document.body.appendChild(toast);
+  if(duration>0) setTimeout(()=>{ toast.classList.add('hide'); setTimeout(()=>toast.remove(),300); }, duration);
+}
+function clearNotifications(){
+  document.querySelectorAll('.notification-toast').forEach(t=>{
+    t.classList.add('hide'); setTimeout(()=>t.remove(),300);
+  });
+}
+
+function hitungOtomatis(){
+  const validation = validateInputs();
+  if(!validation.valid){
+    showNotification(validation.errors.join('\n'), 'error', 5000);
+    return;
+  }
+  clearNotifications();
+
+  const p       = allProviders.find(x=>x.key===currentKey);
+  const total   = parseFloat(document.getElementById('total_providers').value);
+  const siklus  = parseInt(document.getElementById('kali_harvest').value);
+  const harvestEl = document.getElementById('harvest_results_area');
+  const profitEl  = document.getElementById('profit_inputs_area');
+
+  if(!p.multiDrop){
+    const qty = Math.round(total * p.avgDrop * siklus);
+    harvestEl.innerHTML = `
+      <div class="single-result">
+        <span class="item-name">${p.namaItem}</span>
+        <span class="qty">${qty.toLocaleString('en-US')}</span>
+        <span class="item-name" style="font-size:10px;color:var(--dim);">Estimated drop</span>
       </div>`;
-    } else {
-      // Fallback — warna + emoji + teks
-      const lines = s.fallbackTitle.split('\n');
-      return `
-      <div class="bb-slide${isActive}" data-idx="${i}" data-href="${s.href}"
-           style="background:${s.bg};">
-        <div class="bb-slide-fallback">
-          <div class="bb-slide-fallback-icon">${s.fallbackIcon}</div>
-          <div class="bb-slide-fallback-text">${lines.join('<br>')}</div>
+    const savedMode  = document.getElementById('sp_mode')?.value  || 'per';
+    const savedPrice = document.getElementById('sp_price')?.value || '0';
+    profitEl.innerHTML = `
+      <div class="single-profit-area">
+        <div class="sp-row">
+          <span class="sp-label">PRICE</span>
+          <div class="sp-sw">
+            <select id="sp_mode" onchange="recalcSingle(${qty})">
+              <option value="per"  ${savedMode==='per' ?'selected':''}>per</option>
+              <option value="each" ${savedMode==='each'?'selected':''}>each</option>
+            </select>
+          </div>
+          <input class="sp-input" type="number" id="sp_price" value="${savedPrice}" min="0"
+            oninput="recalcSingle(${qty})"
+            onfocus="if(this.value==='0')this.value=''"
+            onblur="if(this.value==='')this.value='0'" placeholder="0">
         </div>
-        ${s.label ? `<div class="bb-slide-overlay"><div class="bb-slide-label">${s.label}</div></div>` : ''}
+      </div>`;
+    recalcSingle(qty);
+
+  } else {
+    const totalRolls = Math.round(total * siklus);
+    const drops      = distributeDrops(totalRolls, p.drops);
+    window._lastDrops = drops;
+
+    let hHtml = '<div class="results-grid">';
+    drops.forEach((d,i) => {
+      hHtml += `<div class="ric" style="animation-delay:${i*0.05}s">
+        <div class="ric-top">
+          ${renderDropIcon(d,'20px')}
+          <div><div class="ric-name">${d.name}</div><div class="ric-sub">Estimated drop</div></div>
+        </div>
+        <div class="ric-qty">${d.qty.toLocaleString('en-US')}</div>
+      </div>`;
+    });
+
+    if(p.key === 'science_station') {
+      hHtml += `<div class="ric-crafting" onclick="openCraftingModal(window._lastDrops)">
+        <div class="ric-crafting-icon">⚗️</div>
+        <div class="ric-crafting-text">What Can Be Crafted</div>
       </div>`;
     }
-  }).join('');
 
-  // Build dots
-  dotsEl.innerHTML = '';
-  bbSlides.forEach((_, i) => {
-    const d = document.createElement('button');
-    d.className = 'bb-dot' + (i === 0 ? ' active' : '');
-    d.setAttribute('aria-label', `Slide ${i + 1}`);
-    d.onclick = (e) => { e.stopPropagation(); bbGoTo(i); };
-    dotsEl.appendChild(d);
-  });
+    hHtml += '</div>';
+    harvestEl.innerHTML = hHtml;
 
-  counterEl.textContent = `1 / ${bbSlides.length}`;
+    let pHtml = '<div class="price-grid">';
+    drops.forEach(d => {
+      const sm = document.getElementById('mode_'+d.key)?.value  || 'per';
+      const sp = document.getElementById('price_'+d.key)?.value || '0';
+      const pr = calcProfit(d.qty, sm, parseFloat(sp)||0);
+      pHtml += `<div class="pic">
+        <div class="pic-header">
+          ${renderDropIcon(d,'16px')}
+          <span class="pic-name">${d.name}</span>
+        </div>
+        <div class="pic-total">${d.qty.toLocaleString('en-US')} total</div>
+        <div class="pic-price-row">
+          <span class="pic-price-label">PRICE</span>
+          <div class="pic-sw">
+            <select id="mode_${d.key}" onchange="recalcMulti()">
+              <option value="per"  ${sm==='per' ?'selected':''}>per</option>
+              <option value="each" ${sm==='each'?'selected':''}>each</option>
+            </select>
+          </div>
+          <input class="pic-input" type="number" id="price_${d.key}" value="${sp}" min="0"
+            oninput="recalcMulti()"
+            onfocus="if(this.value==='0')this.value=''"
+            onblur="if(this.value==='')this.value='0'" placeholder="0">
+        </div>
+        <div class="pic-profit" id="profit_${d.key}" style="color:${d.color};">
+          ${pr.toLocaleString('en-US',{maximumFractionDigits:2})} WL
+        </div>
+      </div>`;
+    });
+    pHtml += '</div>';
+    profitEl.innerHTML = pHtml;
+    recalcMulti();
+  }
 }
 
-function bbGoTo(idx) {
-  const slides = document.querySelectorAll('.bb-slide');
-  const dots   = document.querySelectorAll('.bb-dot');
-  slides[bbCurrent].classList.remove('active');
-  dots[bbCurrent].classList.remove('active');
-  bbCurrent = ((idx % bbSlides.length) + bbSlides.length) % bbSlides.length;
-  slides[bbCurrent].classList.add('active');
-  dots[bbCurrent].classList.add('active');
-  document.getElementById('bbCounter').textContent = `${bbCurrent + 1} / ${bbSlides.length}`;
-  clearInterval(bbTimer);
-  bbTimer = setInterval(() => bbGoTo(bbCurrent + 1), BB_INTERVAL);
+function calcProfit(qty, mode, price){
+  if(price <= 0) return 0;
+  return mode === 'each' ? qty * price : qty / price;
+}
+function recalcSingle(qty){
+  const mode  = document.getElementById('sp_mode')?.value  || 'per';
+  const price = parseFloat(document.getElementById('sp_price')?.value) || 0;
+  document.getElementById('total_revenue').textContent =
+    calcProfit(qty,mode,price).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2})+' WL';
+}
+function recalcMulti(){
+  const p      = allProviders.find(x=>x.key===currentKey);
+  const total  = parseFloat(document.getElementById('total_providers').value) || 0;
+  const siklus = parseInt(document.getElementById('kali_harvest').value) || 1;
+  const drops  = distributeDrops(Math.round(total * siklus), p.drops);
+  let grand = 0;
+  drops.forEach(d => {
+    const mode  = document.getElementById('mode_'+d.key)?.value  || 'per';
+    const price = parseFloat(document.getElementById('price_'+d.key)?.value) || 0;
+    const pr    = calcProfit(d.qty, mode, price);
+    grand += pr;
+    const el = document.getElementById('profit_'+d.key);
+    if(el) el.textContent = pr.toLocaleString('en-US',{maximumFractionDigits:2})+' WL';
+  });
+  document.getElementById('total_revenue').textContent =
+    grand.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2})+' WL';
+}
+function resetKalkulator(){
+  document.getElementById('total_providers').value = '0';
+  document.getElementById('kali_harvest').value    = '1';
+  hitungOtomatis();
 }
 
-// Klik papan → ikuti href slide atau pindah slide
-document.getElementById('bbBoard').addEventListener('click', e => {
-  if (e.target.closest('.bb-dot')) return;
-  const href = bbSlides[bbCurrent].href;
-  if (href && href !== '#') {
-    window.location.href = href;
-  } else {
-    bbGoTo(bbCurrent + 1);
-  }
-});
+renderProviderGrid();
+selectProvider('chicken');
 
-renderBillboard();
-bbTimer = setInterval(() => bbGoTo(bbCurrent + 1), BB_INTERVAL);
+/* ══════════════════════════════════════════════════════
+   CRAFTING SYSTEM — Science Station
+   ══════════════════════════════════════════════════════ */
 
-// ══════════════════════════════
-//  BG STARS — dioptimasi untuk HP low-end
-// ══════════════════════════════
-const starsEl = document.getElementById('stars');
+const CHEM_META = {
+  chem_g: { name:'G', color:'#4ade80', img:'https://cdn.growtopiawiki.com/sprites/914.png' },
+  chem_r: { name:'R', color:'#f87171', img:'https://cdn.growtopiawiki.com/sprites/916.png' },
+  chem_y: { name:'Y', color:'#fde047', img:'https://cdn.growtopiawiki.com/sprites/924.png' },
+  chem_b: { name:'B', color:'#60a5fa', img:'https://cdn.growtopiawiki.com/sprites/920.png' },
+  chem_p: { name:'P', color:'#c084fc', img:'https://cdn.growtopiawiki.com/sprites/918.png' },
+};
 
-// Deteksi low-end: layar kecil ATAU hardware concurrency rendah
-const isLowEnd = (navigator.hardwareConcurrency || 4) <= 2
-               || window.innerWidth < 480;
-
-// Kurangi jumlah elemen sesuai kemampuan device
-const STAR_COUNT  = isLowEnd ? 20 : 40;   // was 60
-const BLOCK_COUNT = isLowEnd ? 4  : 9;    // was 9
-
-// Defer pembuatan ke setelah render pertama selesai (tidak blocking)
-requestAnimationFrame(() => {
-  // Buat bintang dalam satu DocumentFragment — 1x DOM insert, bukan 60x
-  const starFrag = document.createDocumentFragment();
-  for (let i = 0; i < STAR_COUNT; i++) {
-    const s    = document.createElement('div');
-    s.className = 'star';
-    const size  = Math.random() < 0.3 ? 2 : 1;
-    s.style.cssText = [
-      `width:${size}px`,
-      `height:${size}px`,
-      `top:${Math.random()*60}%`,
-      `left:${Math.random()*100}%`,
-      `--dur:${2+Math.random()*3}s`,
-      `--delay:${Math.random()*4}s`,
-      `border-radius:50%`,
-      `will-change:opacity,transform`, // hint GPU
-    ].join(';');
-    starFrag.appendChild(s);
-  }
-  starsEl.appendChild(starFrag);
-
-  // ══════════════════════════════
-  //  BG BLOCKS — jumlah dikurangi di low-end
-  // ══════════════════════════════
-  const blocksEl  = document.getElementById('bgBlocks');
-  const allEmojis = ['🌱','🍀','🌿','⭐','🔒','💎','🪙','🌸','🍄'];
-  const emojis    = allEmojis.slice(0, BLOCK_COUNT);
-  const blockFrag = document.createDocumentFragment();
-
-  emojis.forEach((e, i) => {
-    const b = document.createElement('div');
-    b.className = 'bg-block';
-    b.textContent = e;
-    b.setAttribute('aria-hidden', 'true');
-    b.style.cssText = [
-      `top:${5+Math.random()*70}%`,
-      `left:${i*(100/BLOCK_COUNT)+Math.random()*8}%`,
-      `--dur:${6+Math.random()*5}s`,
-      `--delay:${Math.random()*5}s`,
-      `will-change:transform`,
-    ].join(';');
-    blockFrag.appendChild(b);
-  });
-  blocksEl.appendChild(blockFrag);
-});
-
-// ══════════════════════════════
-//  PAUSE animasi saat tab tidak aktif — hemat baterai & CPU
-// ══════════════════════════════
-document.addEventListener('visibilitychange', () => {
-  const paused = document.hidden ? 'paused' : 'running';
-  starsEl.style.animationPlayState         = paused;
-  document.getElementById('bgBlocks').style.animationPlayState = paused;
-});
-
-// ══════════════════════════════
-//  TOOLS DATA
-//  ▼ Isi field `img` dengan path/URL gambar masing-masing tool
-//    Contoh: img:'assets/provider.png'
-//            img:'https://i.imgur.com/xxx.png'
-//    Kosongkan ('') untuk pakai emoji fallback
-// ══════════════════════════════
-const tools = [
-  { img:'https://cdn.growtopiawiki.com/sprites/3044.png', emoji:'🐔', name:'Provider', badge:'active', href:'https://growculator.xyz/Provider.html', color:'#2d6b1a',
-    desc:'Calculate providers like chicken, cow, science station & tackle box. Estimate drops and profit per cycle.' },
-  { img:'https://cdn.growtopiawiki.com/sprites/10836.png', emoji:'🔬', name:'Surgery',   badge:'soon',   href:'#',               color:'#1a3d6b',
-    desc:'Calculate profit from surgery packs. Estimate tools needed to perform the surgery.' },
-  { img:'https://cdn.growtopiawiki.com/sprites/4322.png', emoji:'⚗️', name:'Autoclave', badge:'soon',   href:'#',               color:'#1a5a5a',
-    desc:'Calculate how many Stitches or Surg tools you can get using the Autoclave efficiently.' },
-  { img:'https://cdn.growtopiawiki.com/sprites/10842.png', emoji:'🕵️', name:'Crime',    badge:'soon',   href:'#',               color:'#6b1a1a',
-    desc:'Calculate the profit earned from selling Crime packs retail in Growtopia.' },
-  { img:'https://cdn.growtopiawiki.com/sprites/10834.png', emoji:'🚀', name:'Startopia', badge:'soon',   href:'#',               color:'#6b3d1a',
-    desc:'Calculate the profit earned from selling Gala packs retail with precision.' },
-  { img:'https://cdn.growtopiawiki.com/sprites/7008.png', emoji:'🤖', name:'Nanoforge', badge:'soon',   href:'#',               color:'#1a5a5a',
-    desc:'Calculate how many tactical drones or teleport charges you get using nano forge tools.' },
-  { img:'https://cdn.growtopiawiki.com/sprites/11538.png', emoji:'👑', name:'Growpass',  badge:'new',    href:'#',               color:'#5a4a10',
-    desc:'Calculate how many points to complete the Growpass, tracking daily points whether premium or free.' },
+/* ══════════════════════════════════════════
+   CRAFTING RECIPES — dengan field img
+   Sprite ID referensi dari growtopiawiki.com
+   ══════════════════════════════════════════ */
+const craftingRecipes = [
+  { name:'Combover',            emoji:'💈', img:'https://cdn.growtopiawiki.com/sprites/770.png', recipe:{ chem_g:1,  chem_r:5,  chem_y:2  }, quantity:1 },
+  { name:'Shocking Hair',       emoji:'💥', img:'https://cdn.growtopiawiki.com/sprites/906.png', recipe:{ chem_g:30, chem_r:4,  chem_b:1  }, quantity:1 },
+  { name:'Shockinator',         emoji:'⚡', img:'https://cdn.growtopiawiki.com/sprites/902.png',  recipe:{ chem_r:2,  chem_y:1              }, quantity:3 },
+  { name:'Steel Table',         emoji:'🪑', img:'https://cdn.growtopiawiki.com/sprites/926.png',  recipe:{ chem_g:2,  chem_b:3              }, quantity:5 },
+  { name:'Dragon Tail',         emoji:'🐉', img:'https://cdn.growtopiawiki.com/sprites/1114.png', recipe:{ chem_r:1,  chem_y:3,  chem_p:2  }, quantity:1 },
+  { name:'Slime',               emoji:'💛', img:'https://cdn.growtopiawiki.com/sprites/978.png',  recipe:{ chem_g:1,  chem_y:2,  chem_b:1  }, quantity:4 },
+  { name:'Lab Coat',            emoji:'🥼', img:'https://cdn.growtopiawiki.com/sprites/772.png',  recipe:{ chem_g:2,  chem_r:1,  chem_p:1  }, quantity:1 },
+  { name:'Ze Goggles',          emoji:'🥽', img:'https://cdn.growtopiawiki.com/sprites/904.png',  recipe:{ chem_b:2,  chem_y:1              }, quantity:1 },
+  { name:'Mysterious Chemical', emoji:'🧪', img:'https://cdn.growtopiawiki.com/sprites/922.png',  recipe:{ chem_y:20, chem_b:10, chem_p:5  }, quantity:1 },
 ];
 
-// Update stat angka tools otomatis
-document.getElementById('toolCount').textContent = tools.length.toString().padStart(2,'0') + ' Modules';
-// toolStatVal sudah dihapus bersama hero stats, skip jika tidak ada
-const toolStatValEl = document.getElementById('toolStatVal');
-if (toolStatValEl) toolStatValEl.textContent = tools.length;
+const MC_RECIPE = { chem_y:20, chem_b:10, chem_p:5 };
 
-// ══════════════════════════════
-//  CAROUSEL
-// ══════════════════════════════
-let current  = 0;
-const VISIBLE = 5;
-const carTrack = document.getElementById('carTrack');
-const dotsEl   = document.getElementById('carDots');
+const craftingRecipes2 = [
+  { name:'Forcefield',         emoji:'🛡️', img:'https://cdn.growtopiawiki.com/sprites/1162.png',  quantity:1,  mystChem:1,   recipe:{ chem_g:20, chem_r:10   } },
+  { name:'Fuel Pack',          emoji:'⛽', img:'https://cdn.growtopiawiki.com/sprites/1746.png',  quantity:5,  mystChem:1,   recipe:{ chem_g:10, chem_b:2    } },
+  { name:'Battle Trout',       emoji:'🐟', img:'https://cdn.growtopiawiki.com/sprites/1542.png',  quantity:1,  mystChem:10,  recipe:{ chem_g:20, chem_p:15   } },
+  { name:'Sassy Boots',        emoji:'👢', img:'https://cdn.growtopiawiki.com/sprites/2588.png',  quantity:1,  mystChem:1,   recipe:{ chem_r:8,  chem_y:4    } },
+  { name:'Block Glue',         emoji:'🧱', img:'https://cdn.growtopiawiki.com/sprites/1866.png',  quantity:10, mystChem:1,   recipe:{ chem_r:1,  chem_p:1    } },
+  { name:'Enhanced Intellect', emoji:'🧠', img:'https://cdn.growtopiawiki.com/sprites/908.png',  quantity:1,  mystChem:3,   recipe:{ chem_y:3,  chem_b:3    } },
+  { name:'Thingamajig',        emoji:'⚙️', img:'https://cdn.growtopiawiki.com/sprites/1310.png',  quantity:1,  mystChem:1,   recipe:{ chem_y:4,  chem_p:3    } },
+  { name:'Reanimator Remote',  emoji:'📡', img:'https://cdn.growtopiawiki.com/sprites/910.png',  quantity:1,  mystChem:200, recipe:{ chem_b:200, chem_p:200 } },
+];
 
-// Build dots
-tools.forEach((t, i) => {
-  const d = document.createElement('button');
-  d.className = 'car-dot' + (i === 0 ? ' active' : '');
-  d.setAttribute('aria-label', `Go to ${t.name}`);
-  d.setAttribute('role', 'tab');
-  d.onclick = () => goTo(i);
-  dotsEl.appendChild(d);
-});
+/* ── Core formula ── */
+function calculateCraftable(harvestMap, recipe) {
+  let minQty = Infinity;
+  for (const [chemKey, needed] of Object.entries(recipe)) {
+    const available = harvestMap[chemKey] || 0;
+    minQty = Math.min(minQty, Math.floor(available / needed));
+  }
+  return minQty === Infinity ? 0 : minQty;
+}
 
-function renderCarousel() {
-  const n       = tools.length;
-  const half    = Math.floor(VISIBLE / 2);
-  const maxSize = Math.min(130, Math.max(90, Math.floor(520 / n)));
+function expandRecipe(item) {
+  const expanded = { ...item.recipe };
+  for (const [chem, amt] of Object.entries(MC_RECIPE)) {
+    expanded[chem] = (expanded[chem] || 0) + item.mystChem * amt;
+  }
+  return expanded;
+}
 
-  carTrack.innerHTML = '';
-  carTrack.style.height = (maxSize + 56) + 'px';
+/* ── Render craft icon: img dengan fallback ke emoji ── */
+function renderCraftIcon(item) {
+  if (item.img && item.img.trim()) {
+    return `<img src="${item.img}" alt="${item.name}"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <span style="display:none;font-size:26px;line-height:1;">${item.emoji}</span>`;
+  }
+  return `<span style="font-size:26px;line-height:1;">${item.emoji}</span>`;
+}
 
-  const outerW  = carTrack.parentElement.clientWidth;
-  const centerX = outerW / 2;
-  const slotW   = Math.floor(outerW / VISIBLE);
-
-  for (let slot = 0; slot < VISIBLE; slot++) {
-    const offset  = slot - half;
-    const idx     = ((current + offset) % n + n) % n;
-    const t       = tools[idx];
-    const dist    = Math.abs(offset);
-    const size    = Math.round(maxSize * (1 - dist * 0.2));
-    const opacity = 1 - dist * 0.25;
-    const zIdx    = VISIBLE - dist;
-    const xPos    = centerX + offset * slotW - size / 2;
-
-    const item = document.createElement('div');
-    item.className    = 'car-item' + (offset === 0 ? ' is-center' : '');
-    item.dataset.slot = slot;
-    item.setAttribute('role', 'button');
-    item.setAttribute('aria-label', offset === 0 ? `Open ${t.name}` : `Go to ${t.name}`);
-    item.style.cssText = `left:${xPos}px;opacity:${opacity};z-index:${zIdx};`;
-
-    const iconContent = t.img
-      ? `<img src="${t.img}" alt="${t.name}" draggable="false" loading="lazy">`
-      : `<span style="font-size:${Math.round(size*0.46)}px;position:relative;z-index:1;
-           filter:drop-shadow(0 4px 8px rgba(0,0,0,0.5));">${t.emoji}</span>`;
-
-    item.innerHTML = `
-      <div class="car-icon-box" style="
-        width:${size}px;height:${size}px;
-        background:linear-gradient(145deg,${t.color} 0%,rgba(0,0,0,0.5) 100%);">
-        ${iconContent}
-        <span class="car-badge cbadge-${t.badge}">${t.badge.toUpperCase()}</span>
+function renderCraftItem(item, recipeHtml, canMake, accentColor, idx) {
+  const craftable    = canMake > 0;
+  const totalProduce = canMake * item.quantity;
+  return `
+    <div class="craft-item ${craftable?'craftable':'uncraftable'}" style="animation-delay:${idx*0.04}s">
+      <div class="craft-icon">${renderCraftIcon(item)}</div>
+      <div class="craft-info">
+        <div class="craft-name">${item.name}</div>
+        ${recipeHtml}
       </div>
-      <div class="car-label" style="font-size:${Math.max(6,Math.round(size*0.09))}px;">
-        ${t.name}
+      <div class="craft-qty-col">
+        <div class="craft-qty" style="color:${craftable ? accentColor : '#4b5563'}">${canMake}×</div>
+        ${item.quantity > 1 ? `<div class="craft-produce">${totalProduce.toLocaleString('en-US')} items</div>` : ''}
+      </div>
+    </div>`;
+}
+
+function chemTags(recipeObj) {
+  return Object.entries(recipeObj).map(([key, amt]) => {
+    const m = CHEM_META[key];
+    const imgHtml = m.img
+      ? `<img src="${m.img}" alt="${m.name}" style="width:13px;height:13px;object-fit:contain;image-rendering:pixelated;flex-shrink:0;" onerror="this.style.display='none'">`
+      : '';
+    return `<span class="chem-tag" style="color:${m.color};border-color:${m.color}33;display:inline-flex;align-items:center;gap:3px;">${imgHtml}${m.name}×${amt}</span>`;
+  }).join('');
+}
+
+function buildSlide1Html(harvestMap) {
+  return craftingRecipes.map((item, idx) => {
+    const canMake  = calculateCraftable(harvestMap, item.recipe);
+    const rHtml    = `<div class="craft-recipe">${chemTags(item.recipe)}</div>`;
+    return renderCraftItem(item, rHtml, canMake, '#6bd44a', idx);
+  }).join('');
+}
+
+function buildSlide2Html(harvestMap) {
+  return craftingRecipes2.map((item, idx) => {
+    const expanded = expandRecipe(item);
+    const canMake  = calculateCraftable(harvestMap, expanded);
+    const rHtml    = `
+      <div class="craft-recipe" style="margin-bottom:3px">
+        ${chemTags(item.recipe)}
+        <span class="mc-badge" style="display:inline-flex;align-items:center;gap:3px;"><img src="https://cdn.growtopiawiki.com/sprites/922.png" alt="MC" style="width:13px;height:13px;object-fit:contain;image-rendering:pixelated;flex-shrink:0;" onerror="this.style.display='none'">×${item.mystChem}</span>
+      </div>
+      <div class="craft-recipe" style="opacity:.55">
+        <span style="font-size:8px;color:var(--dim);margin-right:2px;">↳</span>
+        ${chemTags(expanded)}
       </div>`;
-
-    item.onclick = () => { offset !== 0 ? goTo(idx) : openTool(idx); };
-    carTrack.appendChild(item);
-  }
-
-  // Update info panel
-  const active    = tools[current];
-  const tipIconEl = document.getElementById('tipIcon');
-  if (active.img) {
-    tipIconEl.innerHTML = `<img src="${active.img}" alt="${active.name}"
-      style="width:100%;height:100%;object-fit:contain;image-rendering:pixelated;
-             filter:drop-shadow(0 3px 6px rgba(0,0,0,0.5));">`;
-  } else {
-    tipIconEl.innerHTML = `<span style="font-size:32px;">${active.emoji}</span>`;
-  }
-
-  document.getElementById('tipName').textContent = active.name;
-  document.getElementById('tipDesc').textContent = active.desc;
-
-  const badgeEl     = document.getElementById('tipBadge');
-  badgeEl.textContent = active.badge.toUpperCase();
-  badgeEl.className   = 'tip-badge ' + active.badge;
-
-  const btnEl     = document.getElementById('tipBtn');
-  btnEl.href      = active.href;
-  btnEl.className = 'tip-btn' + (active.href === '#' ? ' disabled' : '');
-
-  document.querySelectorAll('.car-dot').forEach((d, i) => {
-    d.classList.toggle('active', i === current);
-    d.setAttribute('aria-selected', i === current ? 'true' : 'false');
-  });
+    return renderCraftItem(item, rHtml, canMake, '#fb923c', idx);
+  }).join('');
 }
 
-function goTo(idx) {
-  current = ((idx % tools.length) + tools.length) % tools.length;
-  renderCarousel();
+function openCraftingModal(drops) {
+  const harvestMap = {};
+  drops.forEach(d => { harvestMap[d.key] = d.qty; });
+
+  const harvestBarHtml = Object.entries(CHEM_META).map(([key, meta], i, arr) =>
+    `<div class="mhb-item">
+      <img class="mhb-img" src="${meta.img}" alt="${meta.name}" onerror="this.style.display='none'">
+      <span class="mhb-val" style="color:${meta.color}">${(harvestMap[key]||0).toLocaleString('en-US')}</span>
+    </div>${i < arr.length-1 ? '<span class="mhb-sep">·</span>' : ''}`
+  ).join('');
+
+  const s1Html   = buildSlide1Html(harvestMap);
+  const s2Html   = buildSlide2Html(harvestMap);
+  const s1Count  = craftingRecipes.filter(i  => calculateCraftable(harvestMap, i.recipe) > 0).length;
+  const s2Count  = craftingRecipes2.filter(i => calculateCraftable(harvestMap, expandRecipe(i)) > 0).length;
+
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.id = 'crafting-modal';
+  modal.innerHTML = `
+    <div class="modal-box">
+      <div class="modal-header">
+        <span class="modal-title">⚗️ What Can Be Crafted</span>
+        <button class="modal-close" onclick="closeCraftingModal()">✕</button>
+      </div>
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tab-s1" onclick="switchCraftTab(1)">Option 1</button>
+        <button class="modal-tab"        id="tab-s2" onclick="switchCraftTab(2)">Option 2</button>
+      </div>
+      <div class="modal-harvest-bar" style="margin:10px 16px 0;border-radius:8px;flex-shrink:0;">
+        ${harvestBarHtml}
+      </div>
+      <div class="modal-slide active" id="craft-slide-1">
+        <div class="craft-list">${s1Html}</div>
+      </div>
+      <div class="modal-slide" id="craft-slide-2">
+        <div class="mc-expand-note">
+          🧪 Items below need <strong>Mysterious Chemical</strong> (Y×20 · B×10 · P×5).<br>
+          Qty is auto-balanced — chemicals shared across MC + item recipe.
+        </div>
+        <div class="craft-list">${s2Html}</div>
+      </div>
+      <div class="modal-footer" id="craft-footer">
+        ${s1Count} of ${craftingRecipes.length} items craftable
+      </div>
+    </div>`;
+
+  modal._s1footer = `${s1Count} of ${craftingRecipes.length} items craftable`;
+  modal._s2footer = `${s2Count} of ${craftingRecipes2.length} MC items craftable`;
+
+  modal.addEventListener('click', e => { if(e.target === modal) closeCraftingModal(); });
+  document.body.appendChild(modal);
 }
-function carMove(dir) { goTo(current + dir); }
-function openTool(idx) {
-  if (tools[idx].href !== '#') window.location.href = tools[idx].href;
+
+function switchCraftTab(n) {
+  const modal = document.getElementById('crafting-modal');
+  document.getElementById('craft-slide-1').classList.toggle('active', n === 1);
+  document.getElementById('craft-slide-2').classList.toggle('active', n === 2);
+  document.getElementById('tab-s1').classList.toggle('active', n === 1);
+  document.getElementById('tab-s2').classList.toggle('active', n === 2);
+  document.getElementById('craft-footer').textContent = n === 1 ? modal._s1footer : modal._s2footer;
 }
 
-// Swipe
-let touchStartX = 0;
-carTrack.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive:true });
-carTrack.addEventListener('touchend',   e => {
-  const dx = e.changedTouches[0].clientX - touchStartX;
-  if (Math.abs(dx) > 40) carMove(dx < 0 ? 1 : -1);
-});
-
-// Keyboard
-window.addEventListener('keydown', e => {
-  if (e.key === 'ArrowLeft')  carMove(-1);
-  if (e.key === 'ArrowRight') carMove(1);
-  if (e.key === 'Escape')     closeAbout();
-});
-
-// Debounce resize
-let resizeTimer;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(renderCarousel, 150);
-});
-
-renderCarousel();
+function closeCraftingModal() {
+  const modal = document.getElementById('crafting-modal');
+  if(modal) { modal.style.animation = 'fadeIn .15s ease reverse'; setTimeout(() => modal.remove(), 150); }
+}
 </script>
 </body>
 </html>
