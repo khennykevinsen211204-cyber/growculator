@@ -430,7 +430,7 @@ input[type=number]:focus { border-color:rgba(74,158,47,0.6); box-shadow:0 0 0 3p
       <div class="brand-sub">Provider Calculator</div>
     </div>
   </div>
-  <a class="nav-back" href="https://khennykevinsen211204-cyber.github.io/growculator/">← Back</a>
+  <a class="nav-back" href="https://growculator.xyz">← Back</a>
 </nav>
 
 <div class="page">
