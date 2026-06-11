@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Growculator - Surgery Calculator</title>
+<meta name="description" content="Growculator Surgery Calculator — Hitung kebutuhan tool, modal, dan profit surgery Growtopia secara otomatis.">
+<link rel="icon" href="logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sky:    #0f2540;
+  --sky2:   #1a3a5c;
+  --grass:  #4a9e2f;
+  --grass2: #3d8226;
+  --gold:   #ffd700;
+  --gold2:  #ffaa00;
+  --text:   #e8f4e8;
+  --dim:    #7aaa8a;
+  --green:  #6bd44a;
+  --red:    #ef4444;
+  --card:   rgba(8,22,12,0.78);
+  --border: rgba(74,158,47,0.25);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+html,body{
+  background:linear-gradient(180deg,var(--sky) 0%,var(--sky2) 55%,#1e3d28 100%);
+  color:var(--text);font-family:'Nunito','Segoe UI',Arial,sans-serif;
+  min-height:100vh;overflow-x:hidden;
+}
+.stars{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.star{position:absolute;background:#fff;border-radius:50%;
+  animation:twinkle var(--dur,3s) ease-in-out infinite;animation-delay:var(--delay,0s);}
+@keyframes twinkle{0%,100%{opacity:.1;}50%{opacity:.75;}}
+.bg-blocks{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.bg-block{position:absolute;width:26px;height:26px;
+  border:2px solid rgba(255,255,255,0.05);border-radius:4px;
+  font-size:15px;display:flex;align-items:center;justify-content:center;
+  opacity:.09;animation:floatB var(--dur,8s) ease-in-out infinite;animation-delay:var(--delay,0s);}
+@keyframes floatB{0%,100%{transform:translateY(0) rotate(0);}50%{transform:translateY(-12px) rotate(6deg);}}
+
+/* NAV */
+nav{
+  position:sticky;top:0;z-index:500;height:52px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 20px;
+  background:rgba(10,25,40,0.92);backdrop-filter:blur(16px);
+  border-bottom:3px solid var(--grass);
+  box-shadow:0 3px 0 var(--grass2),0 6px 20px rgba(0,0,0,0.4);
+}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-icon{
+  width:32px;height:32px;background:linear-gradient(135deg,var(--grass),#1d4a10);
+  border-radius:8px;border:2px solid var(--grass2);
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,0.3),0 4px 10px rgba(74,158,47,0.3);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.brand-icon img{width:22px;height:22px;image-rendering:pixelated;}
+.brand-name{font-family:'Press Start 2P',monospace;font-size:9px;letter-spacing:1px;line-height:1;}
+.brand-name .g{color:var(--grass);}.brand-name .w{color:#fff;}
+.brand-sub{font-size:9px;font-weight:700;color:var(--dim);margin-top:2px;}
+.nav-back{
+  font-size:10px;font-weight:800;padding:5px 14px;border-radius:6px;cursor:pointer;
+  background:transparent;border:2px solid rgba(255,255,255,0.1);color:var(--dim);
+  text-decoration:none;transition:all .15s;
+}
+.nav-back:hover{border-color:rgba(255,255,255,0.28);color:#fff;}
+
+/* PAGE */
+.page{position:relative;z-index:10;max-width:760px;margin:0 auto;padding:20px 16px 80px;}
+
+/* TICKER */
+.ticker-wrap{
+  display:flex;align-items:center;
+  background:rgba(0,0,0,0.3);border:2px solid rgba(74,158,47,0.3);
+  border-radius:10px;overflow:hidden;margin-bottom:22px;
+}
+.ticker-tag{flex-shrink:0;background:linear-gradient(180deg,var(--grass),var(--grass2));
+  color:#fff;font-family:'Press Start 2P',monospace;font-size:6px;padding:7px 10px;
+  letter-spacing:1px;border-right:2px solid rgba(255,255,255,0.1);}
+.ticker-scroll{overflow:hidden;flex:1;padding:7px 0;}
+.ticker-inner{display:inline-block;animation:ticker 18s linear infinite;
+  font-size:10px;font-weight:800;color:#b8e8a0;white-space:nowrap;}
+.ticker-inner span{padding:0 28px;}
+@keyframes ticker{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+/* TABS */
+.tab-bar{
+  display:flex;gap:4px;margin-bottom:22px;
+  background:rgba(0,0,0,0.3);border:2px solid var(--border);
+  border-radius:12px;padding:4px;
+}
+.tab-btn{
+  flex:1;padding:9px 6px;border:none;border-radius:9px;cursor:pointer;
+  font-family:'Press Start 2P',monospace;font-size:6px;letter-spacing:.5px;
+  background:transparent;color:var(--dim);transition:all .2s;line-height:1.6;text-align:center;
+}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{
+  background:linear-gradient(180deg,var(--grass),var(--grass2));
+  color:#fff;box-shadow:0 3px 0 rgba(0,0,0,0.35),0 0 14px rgba(74,158,47,0.25);
+}
+.tab-panel{display:none;animation:fadeUp .35s ease both;}
+.tab-panel.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* CARDS */
+.s-card{
+  background:var(--card);border:2px solid var(--border);border-radius:16px;
+  padding:18px;backdrop-filter:blur(8px);
+  box-shadow:0 12px 40px rgba(0,0,0,0.5);margin-bottom:18px;
+}
+.s-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.s-icon{font-size:20px;flex-shrink:0;}
+.s-icon img{width:24px;height:24px;object-fit:contain;image-rendering:pixelated;}
+.s-title{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--gold);
+  text-shadow:2px 2px 0 rgba(0,0,0,0.5);}
+.s-badge{margin-left:auto;font-size:10px;font-weight:800;color:var(--dim);
+  background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.07);
+  border-radius:99px;padding:3px 10px;}
+
+/* INPUTS */
+.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:480px){.input-grid{grid-template-columns:1fr;}}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field.full{grid-column:1/-1;}
+label{font-family:'Press Start 2P',monospace;font-size:6px;letter-spacing:1px;color:var(--dim);text-transform:uppercase;}
+input[type=number]{
+  width:100%;background:rgba(0,0,0,0.4);border:2px solid rgba(74,158,47,0.2);
+  border-radius:8px;padding:8px 12px;color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;outline:none;
+  text-align:center;transition:border-color .2s;-webkit-appearance:none;appearance:none;
+}
+input[type=number]:focus{border-color:rgba(74,158,47,0.6);box-shadow:0 0 0 3px rgba(74,158,47,0.1);}
+.field-hint{font-size:9px;font-weight:700;color:rgba(122,170,138,0.5);margin-top:2px;}
+
+/* PER-TOOL PRICE MODE SELECT */
+.tsell-price-row{display:flex;gap:5px;align-items:center;width:100%;}
+.tsell-mode-wrap{position:relative;flex-shrink:0;}
+.tsell-mode-wrap::after{
+  content:'▾';position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  font-size:9px;color:var(--grass);pointer-events:none;
+}
+.tsell-mode{
+  padding:5px 20px 5px 7px;font-size:10px;font-weight:700;border-radius:6px;
+  background:rgba(0,0,0,0.45);border:2px solid rgba(74,158,47,0.22);color:var(--text);
+  font-family:'Nunito',sans-serif;outline:none;cursor:pointer;
+  -webkit-appearance:none;appearance:none;transition:border-color .15s;
+}
+.tsell-mode:focus{border-color:rgba(74,158,47,0.55);}
+
+/* TOOL SELL GRID */
+.tool-sell-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-top:4px;}
+@media(max-width:480px){.tool-sell-grid{grid-template-columns:repeat(2,1fr);}}
+.tsell-card{
+  background:rgba(0,0,0,0.35);border:2px solid rgba(74,158,47,0.15);
+  border-radius:12px;padding:11px 10px;display:flex;flex-direction:column;
+  align-items:center;gap:6px;animation:fadeUp .35s ease both;
+  transition:border-color .2s,transform .15s;
+}
+.tsell-card:hover{border-color:rgba(74,158,47,0.4);transform:translateY(-2px);}
+.tsell-card:focus-within{border-color:rgba(74,158,47,0.55);}
+.tsell-icon{width:34px;height:34px;display:flex;align-items:center;justify-content:center;}
+.tsell-icon img{width:34px;height:34px;object-fit:contain;image-rendering:pixelated;}
+.tsell-name{font-size:10px;font-weight:800;color:#cde;text-align:center;line-height:1.3;}
+.tsell-total{font-size:9px;font-weight:700;color:var(--dim);}
+.tsell-revenue{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--green);
+  text-shadow:0 0 8px rgba(107,212,74,0.3);margin-top:2px;}
+.tsell-input{
+  width:100%;background:rgba(0,0,0,0.4);border:2px solid rgba(74,158,47,0.18);
+  border-radius:6px;padding:5px 7px;color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;outline:none;
+  text-align:center;transition:border-color .2s;-webkit-appearance:none;appearance:none;
+}
+.tsell-input:focus{border-color:rgba(74,158,47,0.6);}
+.tsell-price-label{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--dim);letter-spacing:.5px;}
+
+/* TOTAL BAR */
+.total-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(0,0,0,0.3);border:2px solid rgba(74,158,47,0.15);
+  border-radius:10px;padding:12px 16px;margin-top:14px;
+}
+.total-bar-label{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--dim);letter-spacing:1px;}
+.total-bar-val{
+  font-family:'Press Start 2P',monospace;font-size:14px;color:var(--green);
+  text-shadow:0 0 12px rgba(107,212,74,0.4),2px 2px 0 rgba(0,0,0,0.5);
+  display:flex;align-items:center;gap:6px;
+}
+.total-bar-val img{width:18px;height:18px;image-rendering:pixelated;}
+
+/* RESULT CARDS */
+.result-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;}
+@media(max-width:480px){.result-grid{grid-template-columns:1fr;}}
+.ric{
+  background:rgba(0,0,0,0.35);border:2px solid rgba(74,158,47,0.15);
+  border-radius:12px;padding:13px 14px;animation:fadeUp .4s ease both;
+  transition:border-color .2s,transform .15s;
+}
+.ric:hover{border-color:rgba(74,158,47,0.4);transform:translateY(-2px);}
+.ric-label{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--dim);letter-spacing:1px;margin-bottom:8px;}
+.ric-val{font-family:'Press Start 2P',monospace;font-size:14px;
+  text-shadow:0 0 10px currentColor,2px 2px 0 rgba(0,0,0,0.5);}
+.ric-val.green{color:var(--green);}
+.ric-val.red{color:var(--red);}
+.ric-val.gold{color:var(--gold);}
+.ric-sub{font-size:9px;font-weight:700;color:var(--dim);margin-top:4px;}
+
+/* PROFIT MAIN */
+.profit-main{
+  background:rgba(0,0,0,0.4);border:2px solid rgba(74,158,47,0.2);
+  border-radius:14px;padding:18px;margin-bottom:14px;text-align:center;
+  transition:border-color .3s,background .3s;
+}
+.profit-main.is-profit{border-color:rgba(107,212,74,0.4);background:rgba(74,158,47,0.07);}
+.profit-main.is-loss{border-color:rgba(239,68,68,0.4);background:rgba(239,68,68,0.07);}
+.profit-main-label{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--dim);letter-spacing:1px;margin-bottom:10px;}
+.profit-main-val{font-family:'Press Start 2P',monospace;font-size:20px;
+  text-shadow:0 0 20px currentColor,2px 2px 0 rgba(0,0,0,0.5);display:block;}
+.profit-main-val.green{color:var(--green);}
+.profit-main-val.red{color:var(--red);}
+.profit-indicator{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:8px;padding:4px 12px;border-radius:99px;font-size:10px;font-weight:800;
+}
+.profit-indicator.green{background:rgba(107,212,74,0.15);color:var(--green);border:1px solid rgba(107,212,74,0.3);}
+.profit-indicator.red{background:rgba(239,68,68,0.15);color:var(--red);border:1px solid rgba(239,68,68,0.3);}
+
+/* DIVIDER */
+.divider{height:1px;background:rgba(255,255,255,0.06);margin:14px 0;}
+
+/* INFO BOX */
+.info-box{
+  background:rgba(74,158,47,0.07);border:1px solid rgba(74,158,47,0.2);
+  border-radius:9px;padding:10px 13px;margin-bottom:14px;
+  font-size:10px;font-weight:700;color:var(--dim);line-height:1.6;
+}
+.info-box strong{color:var(--text);}
+
+/* RESET BTN */
+.btn-reset{
+  width:100%;padding:11px;margin-top:6px;
+  background:linear-gradient(180deg,rgba(239,68,68,.15),rgba(180,40,40,.15));
+  border:2px solid rgba(239,68,68,.3);border-radius:8px;
+  color:#ff8888;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+  transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;
+  box-shadow:0 3px 0 rgba(0,0,0,.3);
+}
+.btn-reset:hover{background:linear-gradient(180deg,rgba(239,68,68,.28),rgba(180,40,40,.28));
+  border-color:rgba(239,68,68,.55);transform:translateY(-1px);}
+.btn-reset:active{transform:translateY(2px);}
+
+/* DOCTOR TOOL GRID */
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:4px;}
+@media(max-width:480px){.tools-grid{grid-template-columns:repeat(2,1fr);}}
+.tool-card{
+  background:rgba(0,0,0,0.35);border:2px solid rgba(74,158,47,0.15);
+  border-radius:12px;padding:11px 10px;display:flex;flex-direction:column;
+  align-items:center;gap:6px;animation:fadeUp .35s ease both;transition:border-color .2s,transform .15s;
+}
+.tool-card:hover{border-color:rgba(74,158,47,0.4);transform:translateY(-2px);}
+.tool-card-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;}
+.tool-card-icon img{width:32px;height:32px;object-fit:contain;image-rendering:pixelated;}
+.tool-card-name{font-size:10px;font-weight:800;color:#cde;text-align:center;line-height:1.3;}
+.tool-card-qty{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--gold);
+  text-shadow:0 0 10px rgba(255,215,0,0.3),2px 2px 0 rgba(0,0,0,0.5);}
+.tool-card-sub{font-size:9px;font-weight:700;color:var(--dim);}
+
+/* COST GRID */
+.cost-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+@media(max-width:480px){.cost-grid{grid-template-columns:1fr;}}
+.cost-card{
+  background:rgba(0,0,0,0.3);border:2px solid rgba(74,158,47,0.12);
+  border-radius:10px;padding:10px 12px;transition:border-color .2s;
+}
+.cost-card:focus-within{border-color:rgba(74,158,47,0.4);}
+.cost-card-header{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.cost-card-icon{width:18px;height:18px;object-fit:contain;image-rendering:pixelated;}
+.cost-card-name{font-size:11px;font-weight:800;color:#fff;}
+.cost-card-qty{font-size:9px;font-weight:700;color:var(--dim);margin-bottom:7px;}
+.cost-price-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
+.cost-label{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--dim);white-space:nowrap;}
+.cost-sw{position:relative;}
+.cost-sw::after{content:'▾';position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  font-size:9px;color:var(--grass);pointer-events:none;}
+.cost-sw select{
+  width:auto;padding:5px 20px 5px 7px;font-size:10px;border-radius:6px;
+  background:rgba(0,0,0,0.4);border:2px solid rgba(74,158,47,0.2);color:var(--text);
+  font-family:'Nunito',sans-serif;font-weight:700;outline:none;cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+}
+.cost-input{
+  flex:1;background:rgba(0,0,0,0.4);border:2px solid rgba(74,158,47,0.2);
+  border-radius:6px;padding:5px 8px;color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;outline:none;
+  text-align:center;transition:border-color .2s;-webkit-appearance:none;appearance:none;
+}
+.cost-input:focus{border-color:rgba(74,158,47,0.55);}
+.cost-wl{font-family:'Press Start 2P',monospace;font-size:9px;text-align:right;color:var(--dim);}
+
+/* PROFIT TAB INPUTS */
+.sp-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.sp-label{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--dim);white-space:nowrap;}
+.sp-sw{position:relative;}
+.sp-sw::after{content:'▾';position:absolute;right:7px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--grass);pointer-events:none;}
+.sp-sw select{
+  width:auto;padding:6px 22px 6px 8px;font-size:11px;border-radius:6px;
+  background:rgba(0,0,0,0.4);border:2px solid rgba(74,158,47,0.2);color:var(--text);
+  font-family:'Nunito',sans-serif;font-weight:700;outline:none;cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+}
+.sp-input{
+  flex:1;background:rgba(0,0,0,0.4);border:2px solid rgba(74,158,47,0.2);
+  border-radius:6px;padding:6px 10px;color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;outline:none;
+  text-align:center;transition:border-color .2s;-webkit-appearance:none;appearance:none;
+}
+.sp-input:focus{border-color:rgba(74,158,47,0.55);}
+
+/* ══ DOCTOR TABLE ══ */
+.dc-table-head{
+  display:grid;grid-template-columns:1fr 64px 120px 110px;
+  padding:5px 10px;margin-bottom:4px;
+  border-bottom:2px solid rgba(74,158,47,0.18);
+}
+.dc-th{font-family:'Press Start 2P',monospace;font-size:5.5px;color:var(--dim);
+  letter-spacing:.8px;text-align:center;}
+.dc-th.dc-th-tool{text-align:left;}
+
+.dc-row{
+  display:grid;grid-template-columns:1fr 64px 120px 110px;
+  align-items:center;padding:6px 10px;border-radius:8px;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  transition:background .15s;
+}
+.dc-row:last-child{border-bottom:none;}
+.dc-row:hover{background:rgba(74,158,47,0.05);}
+
+/* tool cell */
+.dc-cell-tool{display:flex;align-items:center;gap:7px;}
+.dc-tool-img{width:22px;height:22px;object-fit:contain;image-rendering:pixelated;flex-shrink:0;}
+.dc-tool-name{font-size:10px;font-weight:800;color:#cde;line-height:1.2;}
+
+/* qty cell */
+.dc-cell-qty{
+  font-family:'Press Start 2P',monospace;font-size:10px;color:var(--gold);
+  text-align:center;text-shadow:0 0 8px rgba(255,215,0,0.25),1px 1px 0 rgba(0,0,0,0.5);
+}
+
+/* price cell */
+.dc-cell-price{display:flex;gap:4px;align-items:center;justify-content:center;}
+.dc-mode-wrap{position:relative;flex-shrink:0;}
+.dc-mode-wrap::after{content:'▾';position:absolute;right:5px;top:50%;transform:translateY(-50%);
+  font-size:8px;color:var(--grass);pointer-events:none;}
+.dc-mode{
+  padding:4px 16px 4px 6px;font-size:9px;font-weight:700;border-radius:5px;
+  background:rgba(0,0,0,0.45);border:1.5px solid rgba(74,158,47,0.22);color:var(--text);
+  font-family:'Nunito',sans-serif;outline:none;cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+}
+.dc-price-input{
+  width:54px;background:rgba(0,0,0,0.4);border:1.5px solid rgba(74,158,47,0.2);
+  border-radius:5px;padding:4px 5px;color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;outline:none;
+  text-align:center;-webkit-appearance:none;appearance:none;
+  transition:border-color .15s;
+}
+.dc-price-input:focus{border-color:rgba(74,158,47,0.6);}
+
+/* wl cell */
+.dc-cell-wl{
+  font-family:'Press Start 2P',monospace;font-size:8px;color:var(--dim);
+  text-align:right;padding-right:4px;word-break:break-word;line-height:1.5;
+}
+.dc-cell-wl.has-val{color:var(--green);text-shadow:0 0 6px rgba(107,212,74,0.25);}
+
+/* footer */
+.dc-table-foot{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:10px;padding:10px 12px;
+  background:rgba(0,0,0,0.3);border:2px solid rgba(74,158,47,0.15);border-radius:10px;
+}
+.dc-tf-left,.dc-tf-right{display:flex;align-items:center;gap:8px;}
+.dc-tf-label{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--dim);letter-spacing:.8px;}
+.dc-tf-qty{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--gold);
+  text-shadow:0 0 10px rgba(255,215,0,0.3),2px 2px 0 rgba(0,0,0,0.5);}
+.dc-tf-wl{display:flex;align-items:center;gap:5px;
+  font-family:'Press Start 2P',monospace;font-size:12px;color:var(--green);
+  text-shadow:0 0 10px rgba(107,212,74,0.3),2px 2px 0 rgba(0,0,0,0.5);}
+
+@media(max-width:480px){
+  .dc-table-head,.dc-row{grid-template-columns:1fr 52px 100px 90px;}
+  .dc-price-input{width:40px;}
+}
+
+/* RESELL SUMMARY BAR — compact top card */
+.rs-summary-bar{
+  display:flex;align-items:stretch;gap:0;
+  background:var(--card);border:2px solid var(--border);border-radius:14px;
+  overflow:hidden;margin-bottom:14px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.45);
+  transition:border-color .3s,background .3s;
+}
+.rs-summary-bar.is-profit{border-color:rgba(107,212,74,0.45);background:rgba(74,158,47,0.06);}
+.rs-summary-bar.is-loss{border-color:rgba(239,68,68,0.45);background:rgba(239,68,68,0.06);}
+.rs-sum-profit{
+  display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+  padding:14px 16px;min-width:0;flex:1.1;
+}
+.rs-sum-label{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--dim);
+  letter-spacing:1px;margin-bottom:5px;}
+.rs-sum-val{font-family:'Press Start 2P',monospace;font-size:16px;
+  text-shadow:0 0 14px currentColor,2px 2px 0 rgba(0,0,0,0.5);margin-bottom:7px;line-height:1.2;}
+.rs-sum-val.green{color:var(--green);}
+.rs-sum-val.red{color:var(--red);}
+.rs-sum-divider{width:1px;background:rgba(255,255,255,0.07);flex-shrink:0;margin:10px 0;}
+.rs-sum-stats{
+  display:flex;flex-direction:column;justify-content:center;
+  gap:0;flex:1;
+}
+.rs-stat{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 14px;border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.rs-stat:last-child{border-bottom:none;}
+.rs-stat-label{font-family:'Press Start 2P',monospace;font-size:5px;color:var(--dim);letter-spacing:.8px;}
+.rs-stat-val{font-family:'Press Start 2P',monospace;font-size:9px;
+  text-shadow:0 0 8px currentColor,1px 1px 0 rgba(0,0,0,0.5);}
+.rs-stat-val.green{color:var(--green);}
+.rs-stat-val.red{color:var(--red);}
+.rs-stat-val.gold{color:var(--gold);}
+@media(max-width:400px){
+  .rs-summary-bar{flex-direction:column;}
+  .rs-sum-divider{width:100%;height:1px;margin:0 10px;}
+  .rs-sum-stats{flex-direction:row;}
+  .rs-stat{flex:1;flex-direction:column;align-items:center;gap:3px;border-bottom:none;
+    border-right:1px solid rgba(255,255,255,0.05);}
+  .rs-stat:last-child{border-right:none;}
+}
+
+@keyframes slideInRight{from{opacity:0;transform:translateX(320px);}to{opacity:1;transform:translateX(0);}}
+@keyframes slideOutRight{from{opacity:1;transform:translateX(0);}to{opacity:0;transform:translateX(320px);}}
+.toast{
+  position:fixed;top:72px;right:16px;padding:13px 18px;border-radius:8px;
+  font-size:12px;font-weight:700;z-index:2000;max-width:300px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.5);animation:slideInRight .3s ease forwards;
+  white-space:pre-wrap;line-height:1.5;
+}
+.toast.error{background:linear-gradient(135deg,#f44336,#d32f2f);color:#fff;border:2px solid #ff6b6b;}
+.toast.success{background:linear-gradient(135deg,#4caf50,#388e3c);color:#fff;border:2px solid #66bb6a;}
+.toast.hide{animation:slideOutRight .3s ease forwards;}
+@media(max-width:480px){.toast{right:8px;left:8px;max-width:none;}}
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<div class="bg-blocks" id="bgBlocks"></div>
+
+<nav>
+  <div class="brand">
+    <div class="brand-icon">
+      <img src="https://cdn.growtopiawiki.com/sprites/10836.png" alt="Surgery">
+    </div>
+    <div>
+      <div class="brand-name"><span class="g">GROW</span><span class="w">CULATOR</span></div>
+      <div class="brand-sub">Surgery Calculator</div>
+    </div>
+  </div>
+  <a class="nav-back" href="https://growculator.xyz">← Back</a>
+</nav>
+
+<div class="page">
+
+  <!-- TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker-tag">NEWS</div>
+    <div class="ticker-scroll">
+      <div class="ticker-inner">
+        <span><img src="https://cdn.growtopiawiki.com/sprites/10836.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;margin-right:4px;">Surgery Pack Resell Calculator</span>
+        <span><img src="https://cdn.growtopiawiki.com/sprites/242.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;margin-right:4px;">Hitung Profit Resell Tool Otomatis</span>
+        <span><img src="https://cdn.growtopiawiki.com/sprites/10806.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;margin-right:4px;">Doctor & Profit Calculator Tersedia</span>
+        <span><img src="https://cdn.growtopiawiki.com/sprites/10836.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;margin-right:4px;">Surgery Pack Resell Calculator</span>
+        <span><img src="https://cdn.growtopiawiki.com/sprites/242.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;margin-right:4px;">Hitung Profit Resell Tool Otomatis</span>
+        <span><img src="https://cdn.growtopiawiki.com/sprites/10806.png" alt="" style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;margin-right:4px;">Doctor & Profit Calculator Tersedia</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab(0)">📦 Pack<br>Resell</button>
+    <button class="tab-btn" onclick="switchTab(1)">🩺 Doctor<br>Calc</button>
+  </div>
+
+  <!-- ══════════════════════════════
+       TAB 1 — PACK RESELL CALCULATOR
+  ══════════════════════════════ -->
+  <div class="tab-panel active" id="tab0">
+
+    <!-- RESULT SUMMARY — TOP -->
+    <div class="rs-summary-bar" id="rs_profit_main">
+      <!-- LEFT: profit big -->
+      <div class="rs-sum-profit">
+        <div class="rs-sum-label">NET PROFIT</div>
+        <div class="rs-sum-val green" id="rs_profit_big">0.00 WL</div>
+        <span class="profit-indicator green" id="rs_indicator">⬤ Profit</span>
+      </div>
+      <!-- DIVIDER -->
+      <div class="rs-sum-divider"></div>
+      <!-- RIGHT: 3 mini stats -->
+      <div class="rs-sum-stats">
+        <div class="rs-stat">
+          <div class="rs-stat-label">MODAL</div>
+          <div class="rs-stat-val red" id="rs_modal">0.00 WL</div>
+        </div>
+        <div class="rs-stat">
+          <div class="rs-stat-label">REVENUE</div>
+          <div class="rs-stat-val gold" id="rs_revenue">0.00 WL</div>
+        </div>
+        <div class="rs-stat">
+          <div class="rs-stat-label">ROI</div>
+          <div class="rs-stat-val green" id="rs_roi">0%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PACK INPUT + TOOL GRID -->
+    <div class="s-card">
+      <div class="s-header">
+        <div class="s-icon"><img src="https://cdn.growtopiawiki.com/sprites/10836.png" alt="Pack"></div>
+        <span class="s-title">Pack Resell</span>
+      </div>
+
+      <!-- PACK INPUT: side by side -->
+      <div class="input-grid" style="margin-bottom:14px;">
+        <div class="field">
+          <label>Jumlah Pack</label>
+          <input type="number" id="rs_packs" value="0" min="0" max="99999"
+            oninput="calcResell()"
+            onfocus="if(this.value==='0')this.value=''"
+            onblur="if(this.value==='')this.value='0'"
+            placeholder="e.g. 10">
+        </div>
+        <div class="field">
+          <label>Harga Beli / Pack (WL)</label>
+          <input type="number" id="rs_packprice" value="0" min="0" step="0.01"
+            oninput="calcResell()"
+            onfocus="if(this.value==='0')this.value=''"
+            onblur="if(this.value==='')this.value='0'"
+            placeholder="e.g. 5">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- TOOL SELL GRID -->
+      <div class="tool-sell-grid" id="rs_tool_grid"></div>
+    </div>
+
+    <button class="btn-reset" onclick="resetTab0()">↺ Reset</button>
+  </div>
+
+  <!-- ══════════════════════════════
+       TAB 2 — DOCTOR CALCULATOR
+  ══════════════════════════════ -->
+  <div class="tab-panel" id="tab1">
+
+    <!-- INPUT -->
+    <div class="s-card">
+      <div class="s-header">
+        <div class="s-icon"><img src="https://cdn.growtopiawiki.com/sprites/10836.png" alt="Doctor"></div>
+        <span class="s-title">Doctor Calculator</span>
+      </div>
+      <div class="input-grid">
+        <div class="field full">
+          <label>Number of Surgeries</label>
+          <input type="number" id="dc_surgeries" value="0" min="0" max="99999"
+            oninput="calcDoctor()"
+            onfocus="if(this.value==='0')this.value=''"
+            onblur="if(this.value==='')this.value='0'"
+            placeholder="e.g. 123">
+        </div>
+      </div>
+    </div>
+
+    <!-- TOOL TABLE -->
+    <div class="s-card" style="padding:14px;">
+      <div class="s-header" style="margin-bottom:10px;">
+        <div class="s-icon"><img src="https://cdn.growtopiawiki.com/sprites/6016.png" alt="Tools"></div>
+        <span class="s-title">Tool Requirements</span>
+        <span class="s-badge" id="dc_total_badge">0 qty</span>
+      </div>
+
+      <!-- TABLE HEADER -->
+      <div class="dc-table-head">
+        <div class="dc-th dc-th-tool">TOOL</div>
+        <div class="dc-th dc-th-qty">QTY</div>
+        <div class="dc-th dc-th-price">PRICE</div>
+        <div class="dc-th dc-th-wl">TOTAL</div>
+      </div>
+
+      <!-- TABLE ROWS (rendered by JS) -->
+      <div id="dc_table_body"></div>
+
+      <!-- FOOTER TOTALS -->
+      <div class="dc-table-foot">
+        <div class="dc-tf-left">
+          <span class="dc-tf-label">TOTAL QTY</span>
+          <span class="dc-tf-qty" id="dc_total_qty">0</span>
+        </div>
+        <div class="dc-tf-right">
+          <span class="dc-tf-label">TOTAL COST</span>
+          <span class="dc-tf-wl" id="dc_total_wl">
+            <img src="https://cdn.growtopiawiki.com/sprites/242.png" alt="WL" style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;">
+            <span id="dc_total_wl_val">0.00 WL</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-reset" onclick="resetTab1()">↺ Reset</button>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+/* ── BG ── */
+const starsEl=document.getElementById('stars');
+for(let i=0;i<50;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=Math.random()<.25?2:1;
+  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*70}%;left:${Math.random()*100}%;--dur:${2+Math.random()*3}s;--delay:${Math.random()*4}s;`;
+  starsEl.appendChild(s);
+}
+const blocksEl=document.getElementById('bgBlocks');
+['🌱','🍀','⭐','🔒','💎','🩺','🧪','🌿'].forEach((e,i)=>{
+  const b=document.createElement('div');b.className='bg-block';b.textContent=e;
+  b.style.cssText=`top:${5+Math.random()*75}%;left:${i*12+Math.random()*8}%;--dur:${6+Math.random()*5}s;--delay:${Math.random()*5}s;`;
+  blocksEl.appendChild(b);
+});
+document.addEventListener('visibilitychange',()=>{
+  const p=document.hidden?'paused':'running';
+  starsEl.style.animationPlayState=p;
+  blocksEl.style.animationPlayState=p;
+});
+
+/* ══════════════════════════════
+   DATA TOOLS
+══════════════════════════════ */
+const PACK_DROPS = [
+  { key:'surg_e',       name:'Surg-E',                 qty:5,  img:'https://cdn.growtopiawiki.com/sprites/10836.png' },
+  { key:'anesthetic',   name:'Surg. Anesthetic',       qty:20, img:'https://cdn.growtopiawiki.com/sprites/10814.png' },
+  { key:'antibiotics',  name:'Surg. Antibiotics',      qty:20, img:'https://cdn.growtopiawiki.com/sprites/10812.png' },
+  { key:'antiseptic',   name:'Surg. Antiseptic',       qty:20, img:'https://cdn.growtopiawiki.com/sprites/10830.png' },
+  { key:'clamp',        name:'Surgical Clamp',         qty:20, img:'https://cdn.growtopiawiki.com/sprites/10816.png' },
+  { key:'defibrillator',name:'Surg. Defibrillator',    qty:20, img:'https://cdn.growtopiawiki.com/sprites/10818.png' },
+  { key:'lab_kit',      name:'Surgical Lab Kit',       qty:20, img:'https://cdn.growtopiawiki.com/sprites/10820.png' },
+  { key:'pins',         name:'Surgical Pins',          qty:20, img:'https://cdn.growtopiawiki.com/sprites/10822.png' },
+  { key:'scalpel',      name:'Surgical Scalpel',       qty:20, img:'https://cdn.growtopiawiki.com/sprites/10808.png' },
+  { key:'splint',       name:'Surgical Splint',        qty:20, img:'https://cdn.growtopiawiki.com/sprites/10828.png' },
+  { key:'stitches',     name:'Surgical Stitches',      qty:20, img:'https://cdn.growtopiawiki.com/sprites/10806.png' },
+  { key:'sponge',       name:'Surgical Sponge',        qty:20, img:'https://cdn.growtopiawiki.com/sprites/10810.png' },
+  { key:'transfusion',  name:'Surgical Transfusion',   qty:20, img:'https://cdn.growtopiawiki.com/sprites/10824.png' },
+  { key:'ultrasound',   name:'Surgical Ultrasound',    qty:20, img:'https://cdn.growtopiawiki.com/sprites/10826.png' },
+];
+
+const DOCTOR_TOOLS = [
+  { key:'stitches',      name:'Stitches',      avg:2.351, img:'https://cdn.growtopiawiki.com/sprites/10806.png' },
+  { key:'scalpels',      name:'Scalpels',      avg:1.706, img:'https://cdn.growtopiawiki.com/sprites/10808.png' },
+  { key:'sponges',       name:'Sponges',       avg:1.518, img:'https://cdn.growtopiawiki.com/sprites/10810.png' },
+  { key:'antibiotics',   name:'Antibiotics',   avg:1.598, img:'https://cdn.growtopiawiki.com/sprites/10812.png' },
+  { key:'anesthetic',    name:'Anesthetic',    avg:1.021, img:'https://cdn.growtopiawiki.com/sprites/10814.png' },
+  { key:'clamps',        name:'Clamps',        avg:0.050, img:'https://cdn.growtopiawiki.com/sprites/10816.png' },
+  { key:'defibrillator', name:'Defibrillator', avg:0.375, img:'https://cdn.growtopiawiki.com/sprites/10818.png' },
+  { key:'lab_kits',      name:'Lab Kits',      avg:0.582, img:'https://cdn.growtopiawiki.com/sprites/10820.png' },
+  { key:'pins',          name:'Pins',          avg:0.302, img:'https://cdn.growtopiawiki.com/sprites/10822.png' },
+  { key:'transfusions',  name:'Transfusions',  avg:0.309, img:'https://cdn.growtopiawiki.com/sprites/10824.png' },
+  { key:'ultrasounds',   name:'Ultrasounds',   avg:0.788, img:'https://cdn.growtopiawiki.com/sprites/10826.png' },
+  { key:'splints',       name:'Splints',       avg:0.712, img:'https://cdn.growtopiawiki.com/sprites/10828.png' },
+  { key:'antiseptic',    name:'Antiseptic',    avg:0.079, img:'https://cdn.growtopiawiki.com/sprites/10830.png' },
+];
+
+/* ══════════════════════════════
+   TAB SWITCHING
+══════════════════════════════ */
+const tabBtns   = document.querySelectorAll('.tab-btn');
+const tabPanels = document.querySelectorAll('.tab-panel');
+function switchTab(idx){
+  tabBtns.forEach((b,i)=>b.classList.toggle('active',i===idx));
+  tabPanels.forEach((p,i)=>p.classList.toggle('active',i===idx));
+}
+
+/* ══════════════════════════════
+   TAB 1 — PACK RESELL
+══════════════════════════════ */
+function buildResellGrid(){
+  const grid = document.getElementById('rs_tool_grid');
+  grid.innerHTML = PACK_DROPS.map((t,i) => `
+    <div class="tsell-card" style="animation-delay:${i*0.04}s">
+      <div class="tsell-icon">
+        <img src="${t.img}" alt="${t.name}"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span style="display:none;font-size:22px;">🔧</span>
+      </div>
+      <div class="tsell-name">${t.name}</div>
+      <div class="tsell-total" id="rstotal_${t.key}">× 0 item</div>
+      <div class="tsell-price-row">
+        <div class="tsell-mode-wrap">
+          <select class="tsell-mode" id="rsmode_${t.key}" onchange="calcResell()">
+            <option value="per">per</option>
+            <option value="each">each</option>
+          </select>
+        </div>
+        <input class="tsell-input" type="number" id="rsprice_${t.key}"
+          value="0" min="0" placeholder="0"
+          oninput="calcResell()"
+          onfocus="if(this.value==='0')this.value=''"
+          onblur="if(this.value==='')this.value='0'">
+      </div>
+      <div class="tsell-revenue" id="rsrev_${t.key}">0.00 WL</div>
+    </div>`).join('');
+}
+
+function calcResell(){
+  const packs     = parseInt(document.getElementById('rs_packs').value)     || 0;
+  const packPrice = parseFloat(document.getElementById('rs_packprice').value) || 0;
+  const modal     = packs * packPrice;
+  let   revenue   = 0;
+
+  PACK_DROPS.forEach(t => {
+    const totalQty = t.qty * packs;
+    const price    = parseFloat(document.getElementById('rsprice_'+t.key)?.value) || 0;
+    const mode     = document.getElementById('rsmode_'+t.key)?.value || 'per';
+    let   toolRev  = 0;
+    if(price > 0){
+      toolRev = mode==='per' ? totalQty / price : totalQty * price;
+    }
+    revenue += toolRev;
+
+    const totalEl = document.getElementById('rstotal_'+t.key);
+    const revEl   = document.getElementById('rsrev_'+t.key);
+    if(totalEl) totalEl.textContent = '× ' + totalQty.toLocaleString('en-US') + ' item';
+    if(revEl)   revEl.textContent   = fmtWL(toolRev) + ' WL';
+  });
+
+  const profit   = revenue - modal;
+  const roi      = modal > 0 ? (profit / modal) * 100 : 0;
+  const isProfit = profit >= 0;
+  const col      = isProfit ? 'green' : 'red';
+
+  document.getElementById('rs_modal').textContent      = fmtWL(modal)   + ' WL';
+  document.getElementById('rs_revenue').textContent    = fmtWL(revenue) + ' WL';
+  document.getElementById('rs_roi').textContent        = roi.toFixed(1) + '%';
+  document.getElementById('rs_roi').className          = 'rs-stat-val ' + (roi >= 0 ? 'gold' : 'red');
+  document.getElementById('rs_profit_big').textContent = fmtWL(profit)  + ' WL';
+  document.getElementById('rs_profit_big').className   = 'rs-sum-val '  + col;
+
+  const indEl = document.getElementById('rs_indicator');
+  indEl.textContent = isProfit ? '⬤ Profit' : '⬤ Loss';
+  indEl.className   = 'profit-indicator ' + col;
+
+  const bar = document.getElementById('rs_profit_main');
+  bar.classList.toggle('is-profit', isProfit  && modal > 0);
+  bar.classList.toggle('is-loss',   !isProfit && modal > 0);
+}
+
+function resetTab0(){
+  document.getElementById('rs_packs').value     = '0';
+  document.getElementById('rs_packprice').value = '0';
+  PACK_DROPS.forEach(t => {
+    const el = document.getElementById('rsprice_'+t.key);
+    if(el) el.value = '0';
+  });
+  calcResell();
+}
+
+/* ══════════════════════════════
+   TAB 2 — DOCTOR CALCULATOR
+══════════════════════════════ */
+function calcDoctor(){
+  const n   = parseInt(document.getElementById('dc_surgeries').value) || 0;
+  const body = document.getElementById('dc_table_body');
+  let totalQty = 0;
+
+  // preserve existing price inputs
+  const rows = body.querySelectorAll('.dc-row');
+  const savedPrices = {}, savedModes = {};
+  rows.forEach(r => {
+    const k = r.dataset.key;
+    const pi = document.getElementById('dcp_'+k);
+    const mi = document.getElementById('dcm_'+k);
+    if(pi) savedPrices[k] = pi.value;
+    if(mi) savedModes[k]  = mi.value;
+  });
+
+  body.innerHTML = DOCTOR_TOOLS.map((t,i) => {
+    const qty  = Math.ceil(t.avg * n);
+    totalQty  += qty;
+    const sp   = savedPrices[t.key] ?? '0';
+    const sm   = savedModes[t.key]  ?? 'per';
+    const price = parseFloat(sp) || 0;
+    const wl   = price > 0 ? (sm==='per' ? qty/price : qty*price) : 0;
+    const wlCls = wl > 0 ? ' has-val' : '';
+    return `<div class="dc-row" data-key="${t.key}" style="animation-delay:${i*0.03}s">
+      <div class="dc-cell-tool">
+        <img class="dc-tool-img" src="${t.img}" alt="${t.name}"
+          onerror="this.style.display='none'">
+        <span class="dc-tool-name">${t.name}</span>
+      </div>
+      <div class="dc-cell-qty">${qty.toLocaleString('en-US')}</div>
+      <div class="dc-cell-price">
+        <div class="dc-mode-wrap">
+          <select class="dc-mode" id="dcm_${t.key}" onchange="recalcDoctor()">
+            <option value="per"  ${sm==='per' ?'selected':''}>per</option>
+            <option value="each" ${sm==='each'?'selected':''}>each</option>
+          </select>
+        </div>
+        <input class="dc-price-input" type="number" id="dcp_${t.key}"
+          value="${sp}" min="0" placeholder="0"
+          oninput="recalcDoctor()"
+          onfocus="if(this.value==='0')this.value=''"
+          onblur="if(this.value==='')this.value='0'">
+      </div>
+      <div class="dc-cell-wl${wlCls}" id="dcwl_${t.key}">${wl>0?fmtWL(wl)+' WL':'—'}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('dc_total_badge').textContent = totalQty.toLocaleString('en-US') + ' qty';
+  document.getElementById('dc_total_qty').textContent   = totalQty.toLocaleString('en-US');
+  recalcDoctor();
+}
+
+function recalcDoctor(){
+  const n = parseInt(document.getElementById('dc_surgeries').value) || 0;
+  let grandWL = 0;
+  DOCTOR_TOOLS.forEach(t => {
+    const qty   = Math.ceil(t.avg * n);
+    const price = parseFloat(document.getElementById('dcp_'+t.key)?.value) || 0;
+    const mode  = document.getElementById('dcm_'+t.key)?.value || 'per';
+    const wl    = price > 0 ? (mode==='per' ? qty/price : qty*price) : 0;
+    grandWL    += wl;
+    const el    = document.getElementById('dcwl_'+t.key);
+    if(el){
+      el.textContent = wl > 0 ? fmtWL(wl)+' WL' : '—';
+      el.className   = 'dc-cell-wl' + (wl > 0 ? ' has-val' : '');
+    }
+  });
+  document.getElementById('dc_total_wl_val').textContent = fmtWL(grandWL) + ' WL';
+}
+
+function resetTab1(){
+  document.getElementById('dc_surgeries').value = '0';
+  DOCTOR_TOOLS.forEach(t => {
+    const pi = document.getElementById('dcp_'+t.key);
+    if(pi) pi.value = '0';
+  });
+  calcDoctor();
+}
+
+/* ── UTILS ── */
+function fmtWL(n){
+  if(!isFinite(n)||isNaN(n)) return '0.00';
+  return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+/* ── INIT ── */
+buildResellGrid();
+calcResell();
+calcDoctor();
+</script>
+</body>
+</html>
